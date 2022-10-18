@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activities.enrollment.EnrollmentReadMRZActivity">
+
+    <LinearLayout
+        android:id="@+id/enrollmentDataFormLayout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/documentIdLabel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:labelFor="@id/documentId"
+            android:text="@string/document_id"
+            tools:text="@string/document_id" />
+
+        <EditText
+            android:id="@+id/documentId"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="@string/document_id_preview"
+            android:importantForAutofill="no"
+            android:inputType="textShortMessage|textNoSuggestions|textCapCharacters"
+            android:minHeight="48dp"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:textColorHint="#757575"
+            tools:ignore="DuplicateSpeakableTextCheck" />
+
+        <TextView
+            android:id="@+id/dateOfBirthLabel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:labelFor="@id/dateOfBirth"
+            android:text="@string/date_of_birth"
+            tools:text="@string/date_of_birth" />
+
+        <EditText
+            android:id="@+id/dateOfBirth"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clickable="false"
+            android:ems="10"
+            android:hint="@string/date_of_birth_preview"
+            android:importantForAutofill="no"
+            android:inputType="date"
+            android:minHeight="48dp"
+            android:textColorHint="#757575"
+            tools:ignore="DuplicateSpeakableTextCheck" />
+
+        <TextView
+            android:id="@+id/dateOfExpiryLabel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:labelFor="@id/dateOfExpiry"
+            android:text="@string/date_of_expiry"
+            tools:text="@string/date_of_expiry" />
+
+        <EditText
+            android:id="@+id/dateOfExpiry"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clickable="false"
+            android:datePickerMode="calendar"
+            android:ems="10"
+            android:hint="@string/date_of_expiry_preview"
+            android:importantForAutofill="no"
+            android:inputType="date"
+            android:minHeight="48dp"
+            android:textColorHint="#757575"
+            tools:ignore="DuplicateSpeakableTextCheck" />
+
+        <TextView
+            android:id="@+id/documentNameLabel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:labelFor="@id/dateOfExpiry"
+            android:text="@string/document_name"
+            tools:text="@string/document_name" />
+
+        <EditText
+            android:id="@+id/documentName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:capitalize="sentences"
+            android:ems="10"
+            android:hint="@string/document_name_preview"
+            android:importantForAutofill="no"
+            android:inputType="textAutoCorrect"
+            android:minHeight="48dp"
+            android:singleLine="true"
+            android:textColorHint="#757575" />
+
+        <Button
+            android:id="@+id/nextButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/next_button_text" />
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

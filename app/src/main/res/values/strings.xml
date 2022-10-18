@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_name">SURFfilesender RDE-client</string>
+    <string name="result">Result</string>
+    <string name="next_button_text">Next</string>
+    <string name="done_button_text">Done</string>
+    <string name="enroll_button_text">Enroll</string>
+    <string name="decrypt_button_text">Decrypt</string>
+    <string name="encrypt_button_text">Encrypt (test)</string>
+    <string name="document_id">Document ID</string>
+    <string name="date_of_birth">Date of birth</string>
+    <string name="date_of_birth_preview">YYMMDD</string>
+    <string name="date_of_expiry">Expiry date</string>
+    <string name="date_of_expiry_preview">YYMMDD</string>
+    <string name="document_id_preview">XXXXXXXXX</string>
+    <string name="document_name">Document name</string>
+    <string name="document_name_preview">My passport</string>
+    <string name="present_document_nfc">Please place the document against the back of your phone so it can be read via NFC</string>
+    <string name="params_input_hint">Enter parameters (JSON encoded)</string>
+    <string name="encryption_key_field_hint">Encryption key</string>
+    <string name="decryption_parameters_field_hint">Decryption parameters (JSON encoded)</string>
+</resources>
