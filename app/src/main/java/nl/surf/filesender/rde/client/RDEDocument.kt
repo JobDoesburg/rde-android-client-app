@@ -1,6 +1,7 @@
 package nl.surf.filesender.rde.client
 
 import net.sf.scuba.smartcards.*
+import net.sf.scuba.util.Hex
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.jmrtd.BACKey
 import org.jmrtd.PACEKeySpec
@@ -63,8 +64,8 @@ class RDEDocument(private val documentName: String, private val bacKey: BACKey) 
         if(!::passportService.isInitialized) throw IllegalStateException("init() must be called before open()")
 
         passportService.open()
-        readSecurityInfo()
         if (RDEDocumentConfig.USE_PACE_INSTEAD_OF_BAC && paceInfo != null) {
+            readSecurityInfo()
             doPACE()
             if (paceSucceeded) {
                 selectApplet()
@@ -296,7 +297,7 @@ class RDEDocument(private val documentName: String, private val bacKey: BACKey) 
 
         passportService.close()
 
-        return RDEEnrollmentParameters(RDEDocumentConfig.MAX_BLOCK_SIZE, RDEDocumentConfig.DG_ID_FOR_RDE, rbResponseData, caInfo!!.objectIdentifier, caPublicKeyInfo!!.subjectPublicKey.encoded, documentName)
+        return RDEEnrollmentParameters(RDEDocumentConfig.MAX_BLOCK_SIZE, RDEDocumentConfig.DG_ID_FOR_RDE, Hex.toHexString(rbResponseData), caInfo!!.objectIdentifier, Hex.toHexString(caPublicKeyInfo!!.subjectPublicKey.encoded), documentName)
     }
 
     fun decrypt(parameters: RDEDecryptionParameters) : ByteArray {
@@ -314,10 +315,10 @@ class RDEDocument(private val documentName: String, private val bacKey: BACKey) 
             logger.warning("Passive authentication failed, trying active authentication: $e")
         }
 
-        val publicKey = decodePublicKey(parameters.oid, parameters.publicKey)
+        val publicKey = decodePublicKey(parameters.oid, Hex.hexStringToBytes(parameters.publicKey))
         doCustomCA(parameters.oid, publicKey)
 
-        val protectedCommand = CommandAPDU(parameters.protectedCommand)
+        val protectedCommand = CommandAPDU(Hex.hexStringToBytes(parameters.protectedCommand))
         logger.info("Sending protected command: $protectedCommand")
 
         val response = passportService.transmit(protectedCommand)

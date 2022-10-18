@@ -5,9 +5,9 @@ import android.nfc.tech.IsoDep
 import android.os.Bundle
 import android.widget.Toast
 import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import net.sf.scuba.smartcards.CardService
+import net.sf.scuba.util.Hex
 import nl.surf.filesender.rde.client.*
 import nl.surf.filesender.rde.client.activities.general.ReadNFCActivity
 import nl.surf.filesender.rde.client.activities.enrollment.EnrollmentResultActivity
@@ -46,7 +46,7 @@ class ExtractDecryptionKeyReadNFCActivity : ReadNFCActivity() {
         document.open()
         val decryptionKey = document.decrypt(decryptionParameters)
 
-        val resultData = Json.encodeToString(decryptionKey)
+        val resultData = Hex.toHexString(decryptionKey)
         val intent = Intent(this, EnrollmentResultActivity::class.java)
         intent.putExtra("result_data", resultData)
         startActivity(intent)

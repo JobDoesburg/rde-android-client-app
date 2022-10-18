@@ -9,6 +9,7 @@ import android.widget.Toast
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import net.sf.scuba.util.Hex
 import nl.surf.filesender.rde.client.R
 import nl.surf.filesender.rde.client.RDEEnrollmentParameters
 import nl.surf.filesender.rde.client.RDEKey
@@ -33,7 +34,7 @@ class EncryptionActivity : AppCompatActivity() {
         }
 
         val decryptionParamsJson = Json.encodeToString(key.decryptionParameters)
-        val encodedKey = Json.encodeToString(key.encryptionKey)
+        val encodedKey = Hex.toHexString(key.encryptionKey)
 
         val encryptionKeyTextView = findViewById<TextView>(R.id.encryptionKeyField)
         val decryptionParametersTextView = findViewById<TextView>(R.id.decryptionParametersField)
