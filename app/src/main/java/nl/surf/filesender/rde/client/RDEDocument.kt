@@ -272,7 +272,7 @@ class RDEDocument(private val documentName: String, private val bacKey: BACKey) 
         logger.info("Received RB response: $rbResponse (unwrapped: $unwrappedResponse)")
 
         val rbResponseData = getResponseData(unwrappedResponse,false)
-        if (rbResponseData.size != length) throw IllegalStateException("RB response data length mismatch")
+        if (rbResponseData.size != length) throw IllegalStateException("RB response data length mismatch. Expected $length, got ${rbResponseData.size}")
         return rbResponseData
     }
 
