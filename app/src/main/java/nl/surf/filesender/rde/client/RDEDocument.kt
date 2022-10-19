@@ -64,8 +64,8 @@ class RDEDocument(private val documentName: String, private val bacKey: BACKey) 
         if(!::passportService.isInitialized) throw IllegalStateException("init() must be called before open()")
 
         passportService.open()
+        readSecurityInfo()
         if (RDEDocumentConfig.USE_PACE_INSTEAD_OF_BAC && paceInfo != null) {
-            readSecurityInfo()
             doPACE()
             if (paceSucceeded) {
                 selectApplet()
@@ -361,7 +361,7 @@ class RDEDocument(private val documentName: String, private val bacKey: BACKey) 
                 CommandAPDU(
                     ISO7816.CLA_ISO7816.toInt(),
                     ISO7816.INS_READ_BINARY.toInt(),
-                    sfi.toByte().toInt(),
+                    sfi,
                     offsetLSB.toInt(),
                     le
                 )
