@@ -334,11 +334,11 @@ class RDEDocument(private val documentName: String, private val bacKey: BACKey) 
         private fun getReadBinaryAPDU(
             sfi: Int,
             offset: Int,
-            le: Int,
+            length: Int,
             isSFIEnabled: Boolean,
             isTLVEncodedOffsetNeeded: Boolean
         ): CommandAPDU {
-            var le = le
+            var le = length
             val offsetMSB = (offset and 0xFF00 shr 8).toByte()
             val offsetLSB = (offset and 0xFF).toByte()
             return if (isTLVEncodedOffsetNeeded) {
@@ -358,11 +358,12 @@ class RDEDocument(private val documentName: String, private val bacKey: BACKey) 
                     ISO7816.INS_READ_BINARY2.toInt(), 0, 0, data, le
                 )
             } else if (isSFIEnabled) {
-                CommandAPDU(
+                val sfiByte = 0x80 or (sfi and 0xFF)
+                return CommandAPDU(
                     ISO7816.CLA_ISO7816.toInt(),
                     ISO7816.INS_READ_BINARY.toInt(),
-                    sfi,
-                    offsetLSB.toInt(),
+                    sfiByte.toByte().toInt(),
+                    0,
                     le
                 )
             } else {
