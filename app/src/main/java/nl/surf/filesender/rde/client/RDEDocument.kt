@@ -304,10 +304,10 @@ class RDEDocument(private val documentName: String, private val bacKey: BACKey) 
         if (!paceSucceeded && !bacSucceeded) throw IllegalStateException("PACE or BAC must be performed before CA")
 
         readEFSOD()
-        readDG1()
+//        readDG1()
 //        readDG2()
-        readDG14()
-        readDG15()
+//        readDG14()
+//        readDG15()
 
         try {
             doPassiveAuth()
