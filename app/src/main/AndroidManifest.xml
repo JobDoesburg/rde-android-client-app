@@ -4,6 +4,12 @@
     package="nl.surf.filesender.rde.client">
 
     <uses-permission android:name="android.permission.NFC" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="true" />
 
     <uses-feature
         android:name="android.hardware.nfc"
@@ -19,6 +25,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SURFfilesenderRDEclientAndroid"
         tools:targetApi="31">
+
         <activity
             android:name=".activities.MainActivity"
             android:exported="true">
@@ -44,8 +51,11 @@
             android:name=".activities.encryption.EncryptionActivity"
             android:exported="false" />
         <activity
-            android:name=".activities.enrollment.EnrollmentReadMRZActivity"
+            android:name=".activities.enrollment.EnrollmentScanQRActivity"
             android:exported="true" />
+        <activity
+            android:name=".activities.enrollment.EnrollmentReadMRZActivity"
+            android:exported="false" />
         <activity
             android:name=".activities.enrollment.EnrollmentReadNFCActivity"
             android:exported="false" />

@@ -68,7 +68,7 @@ open class ReadNFCActivity : AppCompatActivity() {
 
     private fun fixSecurityProviders() {
         Security.removeProvider("BC")
-        Security.removeProvider("AndroidOpenSSL")
+//        Security.removeProvider("AndroidOpenSSL")
         Security.insertProviderAt(BouncyCastleProvider(), 0)
     }
 

@@ -13,9 +13,12 @@ import nl.surf.filesender.rde.client.RDEDocument
 import nl.surf.filesender.rde.client.activities.general.ReadNFCActivity
 
 class EnrollmentReadNFCActivity : ReadNFCActivity() {
+    private var receivedIntentExtras: Bundle? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_read_nfc)
+        receivedIntentExtras = intent.extras
     }
 
     override fun onNewIntent(intent: Intent?) {
@@ -39,6 +42,9 @@ class EnrollmentReadNFCActivity : ReadNFCActivity() {
 
         val resultData = Json.encodeToString(enrollmentParams)
         val intent = Intent(this, EnrollmentResultActivity::class.java)
+        if (receivedIntentExtras != null) {
+            intent.putExtras(receivedIntentExtras!!)
+        }
         intent.putExtra("result_data", resultData)
         startActivity(intent)
     }

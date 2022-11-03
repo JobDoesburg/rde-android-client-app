@@ -9,6 +9,7 @@ import nl.surf.filesender.rde.client.activities.decryption.DecryptionParamsInput
 import nl.surf.filesender.rde.client.activities.decryption.ExtractDecryptionKeyReadNFCActivity
 import nl.surf.filesender.rde.client.activities.encryption.EncryptionParamsInputActivity
 import nl.surf.filesender.rde.client.activities.enrollment.EnrollmentReadMRZActivity
+import nl.surf.filesender.rde.client.activities.enrollment.EnrollmentScanQRActivity
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -17,7 +18,7 @@ class MainActivity : AppCompatActivity() {
 
         val enrollmentButtonClick = findViewById<Button>(R.id.nextButton)
         enrollmentButtonClick.setOnClickListener {
-            val intent = Intent(this, EnrollmentReadMRZActivity::class.java)
+            val intent = Intent(this, EnrollmentScanQRActivity::class.java)
             startActivity(intent)
         }
 

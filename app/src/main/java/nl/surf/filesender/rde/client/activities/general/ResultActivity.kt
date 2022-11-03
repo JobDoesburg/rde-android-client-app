@@ -9,19 +9,27 @@ import nl.surf.filesender.rde.client.R
 import nl.surf.filesender.rde.client.activities.MainActivity
 
 open class ResultActivity : AppCompatActivity() {
+    lateinit var resultData: String
+    lateinit var resultDataView: TextView
+    lateinit var doneButton: Button
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_result)
+        resultDataView = findViewById(R.id.resultDataField)
+        doneButton = findViewById(R.id.doneButton)
 
-        val resultData = intent.getStringExtra("result_data")
-        val resultDataView = findViewById<TextView>(R.id.resultDataField)
+        resultData = intent.getStringExtra("result_data")!!
         resultDataView.text = resultData
 
-        val doneButton = findViewById<Button>(R.id.doneButton)
         doneButton.setOnClickListener {
-            val intent = Intent(this, MainActivity::class.java)
-            startActivity(intent)
+            onDoneButtonClick()
         }
+    }
+
+    open fun onDoneButtonClick() {
+        val intent = Intent(this, MainActivity::class.java)
+        startActivity(intent)
     }
 
 }

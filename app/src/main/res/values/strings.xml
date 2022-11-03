@@ -18,4 +18,5 @@
     <string name="params_input_hint">Enter parameters (JSON encoded)</string>
     <string name="encryption_key_field_hint">Encryption key</string>
     <string name="decryption_parameters_field_hint">Decryption parameters (JSON encoded)</string>
+    <string name="scan_qr_code_text">Scan QR code</string>
 </resources>
