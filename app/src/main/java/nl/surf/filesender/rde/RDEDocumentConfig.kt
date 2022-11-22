@@ -1,4 +1,4 @@
-package nl.surf.filesender.rde.client
+package nl.surf.filesender.rde
 
 import org.jmrtd.PassportService
 

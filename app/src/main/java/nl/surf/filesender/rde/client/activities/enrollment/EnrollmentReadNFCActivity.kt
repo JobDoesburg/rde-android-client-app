@@ -9,16 +9,14 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import net.sf.scuba.smartcards.CardService
 import nl.surf.filesender.rde.client.R
-import nl.surf.filesender.rde.client.RDEDocument
+import nl.surf.filesender.rde.RDEDocument
 import nl.surf.filesender.rde.client.activities.general.ReadNFCActivity
 
 class EnrollmentReadNFCActivity : ReadNFCActivity() {
-    private var receivedIntentExtras: Bundle? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_read_nfc)
-        receivedIntentExtras = intent.extras
     }
 
     override fun onNewIntent(intent: Intent?) {

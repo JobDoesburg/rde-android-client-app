@@ -15,10 +15,11 @@ open class ReadMRZActivity : AppCompatActivity() {
     private lateinit var dateOfBirthField: EditText
     private lateinit var dateOfExpiryField: EditText
     private lateinit var documentNameField: EditText
+    // TODO: store the most recent MRZ Data for better usability
 
     open lateinit var nextActivity: Class<*>
 
-    private var receivedIntentExtras: Bundle? = null
+    var receivedIntentExtras: Bundle? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

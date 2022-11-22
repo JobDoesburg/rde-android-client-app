@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.widget.Button
 import nl.surf.filesender.rde.client.R
 import nl.surf.filesender.rde.client.activities.decryption.DecryptionParamsInputActivity
+import nl.surf.filesender.rde.client.activities.decryption.DecryptionScanQRActivity
 import nl.surf.filesender.rde.client.activities.decryption.ExtractDecryptionKeyReadNFCActivity
 import nl.surf.filesender.rde.client.activities.encryption.EncryptionParamsInputActivity
 import nl.surf.filesender.rde.client.activities.enrollment.EnrollmentReadMRZActivity
@@ -24,7 +25,7 @@ class MainActivity : AppCompatActivity() {
 
         val decryptButtonClick = findViewById<Button>(R.id.decryptButton)
         decryptButtonClick.setOnClickListener {
-            val intent = Intent(this, DecryptionParamsInputActivity::class.java)
+            val intent = Intent(this, DecryptionScanQRActivity::class.java)
             startActivity(intent)
         }
 

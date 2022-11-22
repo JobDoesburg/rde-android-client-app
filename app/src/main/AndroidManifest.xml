@@ -36,10 +36,16 @@
             </intent-filter>
         </activity>
         <activity
+            android:name=".activities.decryption.DecryptionScanQRActivity"
+            android:exported="true" />
+        <activity
             android:name=".activities.decryption.DecryptionParamsInputActivity"
             android:exported="true" />
         <activity
             android:name=".activities.decryption.DecryptionReadMRZActivity"
+            android:exported="true" />
+        <activity
+            android:name=".activities.decryption.DecryptionResultActivity"
             android:exported="true" />
         <activity
             android:name=".activities.decryption.ExtractDecryptionKeyReadNFCActivity"

@@ -11,9 +11,9 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import net.sf.scuba.util.Hex
 import nl.surf.filesender.rde.client.R
-import nl.surf.filesender.rde.client.RDEEnrollmentParameters
-import nl.surf.filesender.rde.client.RDEKey
-import nl.surf.filesender.rde.client.RDEKeyGenerator
+import nl.surf.filesender.rde.data.RDEEnrollmentParameters
+import nl.surf.filesender.rde.data.RDEKey
+import nl.surf.filesender.rde.RDEKeyGenerator
 import nl.surf.filesender.rde.client.activities.MainActivity
 
 class EncryptionActivity : AppCompatActivity() {

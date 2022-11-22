@@ -1,4 +1,4 @@
-package nl.surf.filesender.rde.client
+package nl.surf.filesender.rde
 
 import net.sf.scuba.util.Hex
 import org.bouncycastle.jce.provider.BouncyCastleProvider

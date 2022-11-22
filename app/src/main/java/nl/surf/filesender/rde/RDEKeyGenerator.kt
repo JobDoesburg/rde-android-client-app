@@ -1,6 +1,9 @@
-package nl.surf.filesender.rde.client
+package nl.surf.filesender.rde
 
 import net.sf.scuba.util.Hex
+import nl.surf.filesender.rde.data.RDEDecryptionParameters
+import nl.surf.filesender.rde.data.RDEEnrollmentParameters
+import nl.surf.filesender.rde.data.RDEKey
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.jmrtd.Util
 import org.jmrtd.lds.ChipAuthenticationInfo
@@ -10,14 +13,21 @@ import java.security.interfaces.ECPublicKey
 import java.security.spec.AlgorithmParameterSpec
 import javax.crypto.interfaces.DHPublicKey
 
+/**
+ * Generator for RDE keys.
+ */
 class RDEKeyGenerator(var enrollmentParams: RDEEnrollmentParameters) {
     private val oid : String = enrollmentParams.caOid
     private val agreementAlg: String = RDEDocument.agreementAlgFromCAOID(oid)
-    private val piccPublicKey : PublicKey = RDEDocument.decodePublicKey(oid, Hex.hexStringToBytes(enrollmentParams.piccPublicKey))
+    private val piccPublicKey : PublicKey =
+        RDEDocument.decodePublicKey(oid, Hex.hexStringToBytes(enrollmentParams.piccPublicKey))
     private val params : AlgorithmParameterSpec = paramsFromPublicKey(agreementAlg, piccPublicKey)
     private val cipherAlg : String = ChipAuthenticationInfo.toCipherAlgorithm(oid)
     private val keyLength : Int = ChipAuthenticationInfo.toKeyLength(oid)
 
+    /**
+     * Generate a new RDE key.
+     */
     fun generateKey() : RDEKey {
         val pcdKeyPair = generateKeyPair(agreementAlg, params)
         val pcdPublicKey = pcdKeyPair.public
@@ -30,6 +40,10 @@ class RDEKeyGenerator(var enrollmentParams: RDEEnrollmentParameters) {
         return RDEKey(encryptionKey, decryptionParams)
     }
 
+    /**
+     * Derives the encryption key from the given shared secret.
+     * @param sharedSecret the shared secret
+     */
     private fun deriveEncryptionKey(sharedSecret : ByteArray) : ByteArray {
         val ksEnc = Util.deriveKey(sharedSecret, cipherAlg, keyLength, Util.ENC_MODE)
         val ksMac = Util.deriveKey(sharedSecret, cipherAlg, keyLength, Util.MAC_MODE)
@@ -37,9 +51,18 @@ class RDEKeyGenerator(var enrollmentParams: RDEEnrollmentParameters) {
         return RDEDocument.getDecryptionKeyFromAPDUResponse(emulatedResponse)
     }
 
+    /**
+     * Generates a protected command for the given RDE document, required to retrieve the decryption key.
+     * @param sharedSecret the shared secret
+     */
     private fun generateProtectedCommand(sharedSecret : ByteArray) : ByteArray {
         val rbCommand = RDEDocument.readBinaryCommand(enrollmentParams.Fid, enrollmentParams.n)
-        val protectedCommand = RDEDocument.encryptCommand(rbCommand, oid, sharedSecret, RDEDocumentConfig.TRANCEIVE_LENGTH_FOR_SECURE_MESSAGING)
+        val protectedCommand = RDEDocument.encryptCommand(
+            rbCommand,
+            oid,
+            sharedSecret,
+            RDEDocumentConfig.TRANCEIVE_LENGTH_FOR_SECURE_MESSAGING
+        )
         return protectedCommand.bytes
     }
 

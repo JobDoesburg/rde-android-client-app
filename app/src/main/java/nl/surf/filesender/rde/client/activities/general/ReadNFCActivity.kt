@@ -20,9 +20,13 @@ open class ReadNFCActivity : AppCompatActivity() {
 
     var tag: Tag? = null
 
+    var receivedIntentExtras: Bundle? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_read_nfc)
+
+        receivedIntentExtras = intent.extras
 
         fixSecurityProviders()
 
@@ -68,7 +72,6 @@ open class ReadNFCActivity : AppCompatActivity() {
 
     private fun fixSecurityProviders() {
         Security.removeProvider("BC")
-//        Security.removeProvider("AndroidOpenSSL")
         Security.insertProviderAt(BouncyCastleProvider(), 0)
     }
 

@@ -8,7 +8,8 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import net.sf.scuba.smartcards.CardService
 import net.sf.scuba.util.Hex
-import nl.surf.filesender.rde.client.*
+import nl.surf.filesender.rde.data.RDEDecryptionParameters
+import nl.surf.filesender.rde.RDEDocument
 import nl.surf.filesender.rde.client.activities.general.ReadNFCActivity
 import nl.surf.filesender.rde.client.activities.enrollment.EnrollmentResultActivity
 
@@ -47,7 +48,10 @@ class ExtractDecryptionKeyReadNFCActivity : ReadNFCActivity() {
         val decryptionKey = document.decrypt(decryptionParameters)
 
         val resultData = Hex.toHexString(decryptionKey)
-        val intent = Intent(this, EnrollmentResultActivity::class.java)
+        val intent = Intent(this, DecryptionResultActivity::class.java)
+        if (receivedIntentExtras != null) {
+            intent.putExtras(receivedIntentExtras!!)
+        }
         intent.putExtra("result_data", resultData)
         startActivity(intent)
 

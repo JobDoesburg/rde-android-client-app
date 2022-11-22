@@ -1,7 +1,9 @@
-package nl.surf.filesender.rde.client
+package nl.surf.filesender.rde
 
 import net.sf.scuba.smartcards.*
 import net.sf.scuba.util.Hex
+import nl.surf.filesender.rde.data.RDEDecryptionParameters
+import nl.surf.filesender.rde.data.RDEEnrollmentParameters
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.jmrtd.BACKey
 import org.jmrtd.PACEKeySpec
@@ -57,7 +59,7 @@ class RDEDocument(private val documentName: String, private val bacKey: BACKey) 
             RDEDocumentConfig.MAX_BLOCK_SIZE,
             RDEDocumentConfig.SFI_ENABLED,
             true
-        )
+        ) // TODO maybe dont init from a CardService but from a Tag, and do this in the constructor
     }
 
     fun open() {
@@ -139,7 +141,7 @@ class RDEDocument(private val documentName: String, private val bacKey: BACKey) 
         } catch (e: CardServiceException) {
             logger.warning("PACE failed: ${e.message}. Retrying with BAC")
             passportService.close()
-            passportService.open()
+            passportService.open() // TODO dont reopen, make a new passport service, or just reset
             selectApplet()
             doBAC()
         }
@@ -168,15 +170,21 @@ class RDEDocument(private val documentName: String, private val bacKey: BACKey) 
     }
 
     private fun readEFSOD() {
-        efSOD = SODFile(passportService.getInputStream(PassportService.EF_SOD, RDEDocumentConfig.MAX_BLOCK_SIZE))
+        efSOD = SODFile(passportService.getInputStream(PassportService.EF_SOD,
+            RDEDocumentConfig.MAX_BLOCK_SIZE
+        ))
         logger.info("EF.SOD read successfully")
     }
     private fun readDG1() {
-        dg1 = DG1File(passportService.getInputStream(PassportService.EF_DG1, RDEDocumentConfig.MAX_BLOCK_SIZE))
+        dg1 = DG1File(passportService.getInputStream(PassportService.EF_DG1,
+            RDEDocumentConfig.MAX_BLOCK_SIZE
+        ))
         logger.info("DG1 read successfully")
     }
     private fun readDG2() {
-        dg2 = DG2File(passportService.getInputStream(PassportService.EF_DG2, RDEDocumentConfig.MAX_BLOCK_SIZE))
+        dg2 = DG2File(passportService.getInputStream(PassportService.EF_DG2,
+            RDEDocumentConfig.MAX_BLOCK_SIZE
+        ))
         logger.info("DG2 read successfully")
 
         getFaceImage()
@@ -188,7 +196,9 @@ class RDEDocument(private val documentName: String, private val bacKey: BACKey) 
         logger.info("Face image read successfully from DG2")
     }
     private fun readDG14() {
-        dg14 = DG14File(passportService.getInputStream(PassportService.EF_DG14, RDEDocumentConfig.MAX_BLOCK_SIZE))
+        dg14 = DG14File(passportService.getInputStream(PassportService.EF_DG14,
+            RDEDocumentConfig.MAX_BLOCK_SIZE
+        ))
         logger.info("DG14 read successfully")
 
         // after authentication, we might be able to read more data
@@ -197,7 +207,9 @@ class RDEDocument(private val documentName: String, private val bacKey: BACKey) 
         parseSecurityInfo()
     }
     private fun readDG15() {
-        dg15 = DG15File(passportService.getInputStream(PassportService.EF_DG15, RDEDocumentConfig.MAX_BLOCK_SIZE))
+        dg15 = DG15File(passportService.getInputStream(PassportService.EF_DG15,
+            RDEDocumentConfig.MAX_BLOCK_SIZE
+        ))
         logger.info("DG15 read successfully")
     }
 
@@ -293,7 +305,10 @@ class RDEDocument(private val documentName: String, private val bacKey: BACKey) 
 
         doCA(caInfo!!, caPublicKeyInfo!!)
 
-        val rbResponseData = doRBCall(RDEDocumentConfig.DG_ID_FOR_RDE, RDEDocumentConfig.MAX_BLOCK_SIZE)
+        val rbResponseData = doRBCall(
+            RDEDocumentConfig.DG_ID_FOR_RDE,
+            RDEDocumentConfig.MAX_BLOCK_SIZE
+        )
 
         passportService.close()
 
@@ -304,10 +319,6 @@ class RDEDocument(private val documentName: String, private val bacKey: BACKey) 
         if (!paceSucceeded && !bacSucceeded) throw IllegalStateException("PACE or BAC must be performed before CA")
 
         readEFSOD()
-//        readDG1()
-//        readDG2()
-//        readDG14()
-//        readDG15()
 
         try {
             doPassiveAuth()
@@ -418,9 +429,5 @@ class RDEDocument(private val documentName: String, private val bacKey: BACKey) 
             val keyFactory = KeyFactory.getInstance(agreementAlg, BouncyCastleProvider())
             return keyFactory.generatePublic(X509EncodedKeySpec(keyBytes))
         }
-
     }
-
-
-
 }
