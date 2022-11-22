@@ -7,8 +7,10 @@ import android.nfc.Tag
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import nl.surf.filesender.rde.client.R
+import nl.surf.filesender.rde.data.RDEDocumentMRZData
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.jmrtd.BACKey
 import java.security.Security
@@ -30,14 +32,19 @@ open class ReadNFCActivity : AppCompatActivity() {
 
         fixSecurityProviders()
 
-
         this.nfcAdapter = NfcAdapter.getDefaultAdapter(this)
         if (this.nfcAdapter == null) {
             Toast.makeText(this, "NFC not supported", Toast.LENGTH_LONG).show()
             finish()
         }
-        bacKey = getBACKeyFromIntent(intent!!)
+        val mrzData = intent.extras!!["mrzData"] as RDEDocumentMRZData
+        mrzData.toBACKey()
+        bacKey = mrzData.toBACKey()
+
         documentName = intent.getStringExtra("document_name")
+        if (documentName == null) {
+            documentName = "unknown"
+        }
     }
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
@@ -73,23 +80,6 @@ open class ReadNFCActivity : AppCompatActivity() {
     private fun fixSecurityProviders() {
         Security.removeProvider("BC")
         Security.insertProviderAt(BouncyCastleProvider(), 0)
-    }
-
-    private fun getBACKeyFromIntent(intent: Intent): BACKey? {
-        val documentId = intent.extras!!.getString("document_id")
-        val dateOfBirth = intent.extras!!.getString("date_of_birth")
-        val dateOfExpiry = intent.extras!!.getString("date_of_expiry")
-        return try {
-            BACKey(documentId, dateOfBirth, dateOfExpiry)
-        } catch (e: Exception) {
-            Log.e("EnrollmentReadNFC", "Failed to create BACKey", e)
-            Toast.makeText(
-                applicationContext,
-                "Data invalid", Toast.LENGTH_SHORT
-            ).show()
-            finishActivity(RESULT_CANCELED);
-            null
-        }
     }
 
 }

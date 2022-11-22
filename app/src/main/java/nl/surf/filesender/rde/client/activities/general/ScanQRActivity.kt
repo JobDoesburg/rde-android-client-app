@@ -1,5 +1,7 @@
 package nl.surf.filesender.rde.client.activities.general
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -62,6 +64,11 @@ open class ScanQRActivity : AppCompatActivity() {
 
     open fun processQRCodeScan(data: String) {
         Toast.makeText(this, "QR Code Scanned", Toast.LENGTH_LONG).show()
+
+        val resultIntent = Intent()
+        resultIntent.putExtra("result", data);
+        setResult(Activity.RESULT_OK, resultIntent);
+        finish();
     }
 
 }

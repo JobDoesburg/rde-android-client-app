@@ -1,5 +1,6 @@
 package nl.surf.filesender.rde.client.activities.enrollment
 
+import android.app.Activity
 import android.content.Intent
 import android.nfc.tech.IsoDep
 import android.os.Bundle
@@ -38,12 +39,12 @@ class EnrollmentReadNFCActivity : ReadNFCActivity() {
         document.open()
         val enrollmentParams = document.enroll()
 
-        val resultData = Json.encodeToString(enrollmentParams)
-        val intent = Intent(this, EnrollmentResultActivity::class.java)
+        val returnIntent = Intent()
         if (receivedIntentExtras != null) {
-            intent.putExtras(receivedIntentExtras!!)
+            returnIntent.putExtras(receivedIntentExtras!!)
         }
-        intent.putExtra("result_data", resultData)
-        startActivity(intent)
+        returnIntent.putExtra("result", enrollmentParams)
+        setResult(Activity.RESULT_OK, returnIntent);
+        finish();
     }
 }

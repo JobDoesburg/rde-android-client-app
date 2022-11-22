@@ -106,7 +106,7 @@ class DecryptionHandshakeProtocol(private val socket: DefaultWebSocketSession) {
         val ivSpec = IvParameterSpec(iv)
         cipher.init(Cipher.ENCRYPT_MODE, keySpec, ivSpec)
         val encrypted = cipher.doFinal(data)
-        socket.send(Hex.toHexString(encrypted))
+        socket.send(encrypted)
         logger.info("Sent ${Hex.toHexString(encrypted)}")
     }
 

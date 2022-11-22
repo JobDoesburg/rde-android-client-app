@@ -36,29 +36,20 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activities.decryption.DecryptionScanQRActivity"
+            android:name=".activities.enrollment.EnrollmentActivity"
             android:exported="true" />
         <activity
-            android:name=".activities.decryption.DecryptionParamsInputActivity"
+            android:name=".activities.decryption.DecryptionActivity"
             android:exported="true" />
         <activity
-            android:name=".activities.decryption.DecryptionReadMRZActivity"
-            android:exported="true" />
-        <activity
-            android:name=".activities.decryption.DecryptionResultActivity"
-            android:exported="true" />
-        <activity
-            android:name=".activities.decryption.ExtractDecryptionKeyReadNFCActivity"
+            android:name=".activities.general.ScanQRActivity"
             android:exported="false" />
         <activity
-            android:name=".activities.encryption.EncryptionParamsInputActivity"
-            android:exported="true" />
-        <activity
-            android:name=".activities.encryption.EncryptionActivity"
+            android:name=".activities.general.ReadNFCActivity"
             android:exported="false" />
         <activity
-            android:name=".activities.enrollment.EnrollmentScanQRActivity"
-            android:exported="true" />
+            android:name=".activities.general.ReadMRZActivity"
+            android:exported="false" />
         <activity
             android:name=".activities.enrollment.EnrollmentReadMRZActivity"
             android:exported="false" />
@@ -66,7 +57,10 @@
             android:name=".activities.enrollment.EnrollmentReadNFCActivity"
             android:exported="false" />
         <activity
-            android:name=".activities.enrollment.EnrollmentResultActivity"
+            android:name=".activities.decryption.DecryptionReadMRZActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activities.decryption.DecryptionReadNFCActivity"
             android:exported="false" />
     </application>
 

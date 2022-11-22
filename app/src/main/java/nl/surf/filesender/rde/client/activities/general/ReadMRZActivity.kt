@@ -1,5 +1,6 @@
 package nl.surf.filesender.rde.client.activities.general
 
+import android.app.Activity
 import android.app.DatePickerDialog
 import android.content.Intent
 import android.os.Bundle
@@ -8,6 +9,7 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import nl.surf.filesender.rde.client.R
+import nl.surf.filesender.rde.data.RDEDocumentMRZData
 import java.util.*
 
 open class ReadMRZActivity : AppCompatActivity() {
@@ -17,15 +19,9 @@ open class ReadMRZActivity : AppCompatActivity() {
     private lateinit var documentNameField: EditText
     // TODO: store the most recent MRZ Data for better usability
 
-    open lateinit var nextActivity: Class<*>
-
-    var receivedIntentExtras: Bundle? = null
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_read_mrz)
-
-        receivedIntentExtras = intent.extras
 
         documentIdField = findViewById(R.id.documentId)
         dateOfBirthField = findViewById(R.id.dateOfBirth)
@@ -38,38 +34,6 @@ open class ReadMRZActivity : AppCompatActivity() {
         val enrollmentButtonClick = findViewById<Button>(R.id.nextButton)
         enrollmentButtonClick.setOnClickListener {
             onNextButtonClick()
-        }
-    }
-
-    private fun validateMRZData(): Boolean {
-        val documentId = documentIdField.text.toString()
-        val dateOfBirth = dateOfBirthField.text.toString()
-        val dateOfExpiry = dateOfExpiryField.text.toString()
-        val documentName = documentNameField.text.toString()
-
-        if (documentId.length != 9 || dateOfBirth.length != 6 || dateOfExpiry.length != 6 || documentName.isEmpty()) {
-            return false
-        }
-
-        return true
-    }
-
-    private fun onNextButtonClick() {
-        if (validateMRZData()) {
-            val intent = Intent(this, nextActivity)
-            if (receivedIntentExtras != null) {
-                intent.putExtras(receivedIntentExtras!!)
-            }
-            intent.putExtra("document_id",documentIdField.text.toString());
-            intent.putExtra("date_of_birth",dateOfBirthField.text.toString());
-            intent.putExtra("date_of_expiry",dateOfExpiryField.text.toString());
-            intent.putExtra("document_name",documentNameField.text.toString());
-            startActivity(intent)
-        } else {
-            Toast.makeText(
-                applicationContext,
-                "Date not valid, try again.", Toast.LENGTH_SHORT
-            ).show()
         }
     }
 
@@ -92,6 +56,32 @@ open class ReadMRZActivity : AppCompatActivity() {
             )
             datePickerDialog.show()
         }
+    }
+
+    private fun validateMRZData(): RDEDocumentMRZData? {
+        val documentId = documentIdField.text.toString()
+        val dateOfBirth = dateOfBirthField.text.toString()
+        val dateOfExpiry = dateOfExpiryField.text.toString()
+        val documentName = documentNameField.text.toString()
+
+        if (documentId.length != 9 || dateOfBirth.length != 6 || dateOfExpiry.length != 6 || documentName.isEmpty()) {
+            return null
+        }
+
+        return RDEDocumentMRZData(documentId = documentId, dateOfBirth = dateOfBirth, dateOfExpiry = dateOfExpiry)
+    }
+
+    private fun onNextButtonClick() {
+        val mrzData = validateMRZData()
+        if (mrzData == null) {
+            Toast.makeText(this, "Data not valid", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val resultIntent = Intent()
+        resultIntent.putExtra("result", mrzData);
+        setResult(Activity.RESULT_OK, resultIntent);
+        finish();
     }
 
 }

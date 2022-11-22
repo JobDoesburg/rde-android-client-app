@@ -1,38 +1,29 @@
 package nl.surf.filesender.rde.client.activities.decryption
 
+import android.app.Activity
 import android.content.Intent
 import android.nfc.tech.IsoDep
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.json.Json
 import net.sf.scuba.smartcards.CardService
 import net.sf.scuba.util.Hex
 import nl.surf.filesender.rde.data.RDEDecryptionParameters
 import nl.surf.filesender.rde.RDEDocument
 import nl.surf.filesender.rde.client.activities.general.ReadNFCActivity
-import nl.surf.filesender.rde.client.activities.enrollment.EnrollmentResultActivity
 
-class ExtractDecryptionKeyReadNFCActivity : ReadNFCActivity() {
+class DecryptionReadNFCActivity : ReadNFCActivity() {
 
     lateinit var decryptionParameters: RDEDecryptionParameters
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        val decryptionParamsData = intent.getStringExtra("data")!!
-        try {
-            decryptionParameters = Json.decodeFromString(decryptionParamsData)
-        } catch (e: Exception) {
-            Toast.makeText(this, "Invalid enrollment parameters", Toast.LENGTH_LONG).show()
-            finish()
-            return
-        }
+        decryptionParameters = intent.extras!!["decryptionParams"] as RDEDecryptionParameters
+        Log.d("RDE", "Decryption parameters: $decryptionParameters")
     }
 
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
-
         extractDecryptionKey(decryptionParameters)
     }
 
@@ -44,17 +35,23 @@ class ExtractDecryptionKeyReadNFCActivity : ReadNFCActivity() {
         val cardService = CardService.getInstance(isoDep)
 
         document.init(cardService)
-        document.open()
-        val decryptionKey = document.decrypt(decryptionParameters)
-
-        val resultData = Hex.toHexString(decryptionKey)
-        val intent = Intent(this, DecryptionResultActivity::class.java)
-        if (receivedIntentExtras != null) {
-            intent.putExtras(receivedIntentExtras!!)
+        try {
+            document.open()
+            val decryptionKey = Hex.toHexString(document.decrypt(decryptionParameters))
+            val returnIntent = Intent()
+            if (receivedIntentExtras != null) {
+                returnIntent.putExtras(receivedIntentExtras!!)
+            }
+            returnIntent.putExtra("result", decryptionKey)
+            setResult(Activity.RESULT_OK, returnIntent);
+            finish();
+        } catch (e: Exception) {
+            Log.e("RDE", "Error while decrypting", e)
+            Toast.makeText(this, "Error while decrypting: ${e.message}", Toast.LENGTH_LONG).show()
+            val returnIntent = Intent()
+            setResult(Activity.RESULT_CANCELED, returnIntent);
+            finish();
         }
-        intent.putExtra("result_data", resultData)
-        startActivity(intent)
-
     }
 
 }

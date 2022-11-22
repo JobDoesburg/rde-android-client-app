@@ -5,6 +5,4 @@ import nl.surf.filesender.rde.client.activities.general.ReadMRZActivity
 
 class EnrollmentReadMRZActivity : ReadMRZActivity() {
 
-    override var nextActivity: Class<*> = EnrollmentReadNFCActivity::class.java
-
 }

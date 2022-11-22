@@ -140,8 +140,6 @@ class RDEDocument(private val documentName: String, private val bacKey: BACKey) 
             logger.info("PACE succeeded: $paceResult")
         } catch (e: CardServiceException) {
             logger.warning("PACE failed: ${e.message}. Retrying with BAC")
-            passportService.close()
-            passportService.open() // TODO dont reopen, make a new passport service, or just reset
             selectApplet()
             doBAC()
         }

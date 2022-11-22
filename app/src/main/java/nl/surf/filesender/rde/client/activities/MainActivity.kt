@@ -5,12 +5,8 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
 import nl.surf.filesender.rde.client.R
-import nl.surf.filesender.rde.client.activities.decryption.DecryptionParamsInputActivity
-import nl.surf.filesender.rde.client.activities.decryption.DecryptionScanQRActivity
-import nl.surf.filesender.rde.client.activities.decryption.ExtractDecryptionKeyReadNFCActivity
-import nl.surf.filesender.rde.client.activities.encryption.EncryptionParamsInputActivity
-import nl.surf.filesender.rde.client.activities.enrollment.EnrollmentReadMRZActivity
-import nl.surf.filesender.rde.client.activities.enrollment.EnrollmentScanQRActivity
+import nl.surf.filesender.rde.client.activities.decryption.DecryptionActivity
+import nl.surf.filesender.rde.client.activities.enrollment.EnrollmentActivity
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -19,24 +15,14 @@ class MainActivity : AppCompatActivity() {
 
         val enrollmentButtonClick = findViewById<Button>(R.id.nextButton)
         enrollmentButtonClick.setOnClickListener {
-            val intent = Intent(this, EnrollmentScanQRActivity::class.java)
+            val intent = Intent(this, EnrollmentActivity::class.java)
             startActivity(intent)
         }
 
         val decryptButtonClick = findViewById<Button>(R.id.decryptButton)
         decryptButtonClick.setOnClickListener {
-            val intent = Intent(this, DecryptionScanQRActivity::class.java)
+            val intent = Intent(this, DecryptionActivity::class.java)
             startActivity(intent)
         }
-
-
-        val encryptButtonClick = findViewById<Button>(R.id.encryptButton)
-        encryptButtonClick.setOnClickListener {
-            val intent = Intent(this, EncryptionParamsInputActivity::class.java)
-            startActivity(intent)
-
-        }
-
-
     }
 }
