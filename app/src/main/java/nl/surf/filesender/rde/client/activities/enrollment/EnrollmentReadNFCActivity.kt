@@ -14,6 +14,10 @@ import nl.surf.filesender.rde.RDEDocument
 import nl.surf.filesender.rde.client.activities.general.ReadNFCActivity
 
 class EnrollmentReadNFCActivity : ReadNFCActivity() {
+    companion object {
+        const val RDE_DG_ID = 14
+        const val RDE_RB_LENGTH = 223
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,15 +33,19 @@ class EnrollmentReadNFCActivity : ReadNFCActivity() {
     }
 
     private fun enroll(){
-        val document = RDEDocument(documentName!!, bacKey!!)
+        val document = RDEDocument(bacKey!!)
 
         val isoDep = IsoDep.get(tag)
         isoDep.timeout = 100000 // Long because of debugging, remove in production
         val cardService = CardService.getInstance(isoDep)
 
+        val maskedDocumentNumber = "*******" + bacKey!!.documentNumber.substring(6, 9)
+        val enrollmentDocumentName = "$documentName ($maskedDocumentNumber)"
+
         document.init(cardService)
         document.open()
-        val enrollmentParams = document.enroll()
+        val enrollmentParams = document.enroll(enrollmentDocumentName, RDE_DG_ID, RDE_RB_LENGTH, withSecurityData = true, withMRZData = true, withFaceImage = true)
+        document.close()
 
         val returnIntent = Intent()
         if (receivedIntentExtras != null) {

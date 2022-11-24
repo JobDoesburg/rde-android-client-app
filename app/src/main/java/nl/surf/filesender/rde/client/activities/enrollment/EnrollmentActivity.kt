@@ -2,7 +2,6 @@ package nl.surf.filesender.rde.client.activities.enrollment
 
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import io.ktor.client.*
 import io.ktor.client.engine.okhttp.*
@@ -14,7 +13,7 @@ import kotlinx.coroutines.runBlocking
 import nl.surf.filesender.rde.client.activities.MainActivity
 import nl.surf.filesender.rde.client.activities.decryption.DecryptionActivity
 import nl.surf.filesender.rde.client.activities.general.ScanQRActivity
-import nl.surf.filesender.rde.data.RDEDocumentMRZData
+import nl.surf.filesender.rde.client.RDEDocumentMRZData
 import nl.surf.filesender.rde.data.RDEEnrollmentParameters
 
 class EnrollmentActivity : AppCompatActivity() {
@@ -26,6 +25,7 @@ class EnrollmentActivity : AppCompatActivity() {
 
     private lateinit var socketUrl : String
     private lateinit var mrzData: RDEDocumentMRZData
+    private lateinit var documentName: String
     private lateinit var enrollmentParams: RDEEnrollmentParameters
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,6 +46,7 @@ class EnrollmentActivity : AppCompatActivity() {
     private fun launchReadNFC() {
         val intent = Intent(this, EnrollmentReadNFCActivity::class.java)
         intent.putExtra("mrzData", mrzData)
+        intent.putExtra("documentName", documentName)
         startActivityForResult(intent, DecryptionActivity.LAUNCH_READ_NFC)
     }
 
@@ -66,17 +67,16 @@ class EnrollmentActivity : AppCompatActivity() {
                 socketUrl = data?.getStringExtra("result")!!
                 launchMRZInput()
             } else if (resultCode == RESULT_CANCELED) {
-                Toast.makeText(this, "Failed, retry.", Toast.LENGTH_SHORT).show()
-                launchQRScanner()
+                finish()
             }
         }
         if (requestCode == LAUNCH_MRZ_INPUT) {
             if (resultCode == RESULT_OK) {
                 mrzData = data?.extras!!["result"] as RDEDocumentMRZData
+                documentName = data.getStringExtra("documentName")!!
                 launchReadNFC()
             } else if (resultCode == RESULT_CANCELED) {
-                Toast.makeText(this, "Failed, retry.", Toast.LENGTH_SHORT).show()
-                launchMRZInput()
+                launchQRScanner()
             }
         }
         if (requestCode == LAUNCH_READ_NFC) {
@@ -84,8 +84,7 @@ class EnrollmentActivity : AppCompatActivity() {
                 enrollmentParams = data?.extras!!["result"] as RDEEnrollmentParameters
                 performEnrollment()
             } else if (resultCode == RESULT_CANCELED) {
-                Toast.makeText(this, "Failed, retry.", Toast.LENGTH_SHORT).show()
-                launchReadNFC()
+                launchMRZInput()
             }
         }
     }

@@ -7,10 +7,9 @@ import android.nfc.Tag
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import nl.surf.filesender.rde.client.R
-import nl.surf.filesender.rde.data.RDEDocumentMRZData
+import nl.surf.filesender.rde.client.RDEDocumentMRZData
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.jmrtd.BACKey
 import java.security.Security
@@ -41,10 +40,8 @@ open class ReadNFCActivity : AppCompatActivity() {
         mrzData.toBACKey()
         bacKey = mrzData.toBACKey()
 
-        documentName = intent.getStringExtra("document_name")
-        if (documentName == null) {
-            documentName = "unknown"
-        }
+        documentName = intent.getStringExtra("documentName")
+        Log.d("ReadNFCActivity", "Document name: $documentName")
     }
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)

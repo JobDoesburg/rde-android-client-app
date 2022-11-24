@@ -1,4 +1,4 @@
-package nl.surf.filesender.rde.data
+package nl.surf.filesender.rde.client
 
 import org.jmrtd.BACKey
 import java.io.Serializable

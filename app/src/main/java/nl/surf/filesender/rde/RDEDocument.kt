@@ -22,7 +22,7 @@ import java.util.logging.Logger
 import kotlin.experimental.and
 
 
-class RDEDocument(private val documentName: String, private val bacKey: BACKey) {
+class RDEDocument(private val bacKey: BACKey) {
     private val logger = Logger.getLogger(RDEDocument::class.java.name)
 
     private lateinit var passportService: PassportService
@@ -40,24 +40,28 @@ class RDEDocument(private val documentName: String, private val bacKey: BACKey) 
     private var paSucceeded = false
     private var caSucceeded = false
 
-    lateinit var efSOD : SODFile
-    lateinit var dg1 : DG1File
-    lateinit var dg2 : DG2File
-    lateinit var faceImageBytes: ByteArray
-    lateinit var dg14 : DG14File
-    lateinit var dg15 : DG15File
+    private lateinit var efSOD : SODFile
+    private lateinit var dg1 : DG1File
+    private lateinit var dg2 : DG2File
+    private lateinit var faceImageBytes: ByteArray
+    private lateinit var dg14 : DG14File
 
+    private lateinit var pcdPublicKey : PublicKey
+    private lateinit var pcdPrivateKey : PrivateKey
 
-    lateinit var pcdPublicKey : PublicKey
-    lateinit var pcdPrivateKey : PrivateKey
+    fun init(cardService: CardService, maxTranceiveLength: Int = PassportService.NORMAL_MAX_TRANCEIVE_LENGTH, maxBlockSize: Int = PassportService.DEFAULT_MAX_BLOCKSIZE) {
+        if (maxBlockSize > PassportService.DEFAULT_MAX_BLOCKSIZE) {
+            throw IllegalArgumentException("Max block size cannot be larger than ${PassportService.DEFAULT_MAX_BLOCKSIZE}")
+        }
+        if (maxTranceiveLength > PassportService.NORMAL_MAX_TRANCEIVE_LENGTH) {
+            throw IllegalArgumentException("Max tranceive length cannot be larger than ${PassportService.NORMAL_MAX_TRANCEIVE_LENGTH}")
+        }
 
-
-    fun init(cardService: CardService) {
         passportService = PassportService(
             cardService,
-            RDEDocumentConfig.TRANCEIVE_LENGTH_FOR_SECURE_MESSAGING,
-            RDEDocumentConfig.MAX_BLOCK_SIZE,
-            RDEDocumentConfig.SFI_ENABLED,
+            maxTranceiveLength,
+            maxBlockSize,
+            true,
             true
         ) // TODO maybe dont init from a CardService but from a Tag, and do this in the constructor
     }
@@ -67,7 +71,7 @@ class RDEDocument(private val documentName: String, private val bacKey: BACKey) 
 
         passportService.open()
         readSecurityInfo()
-        if (RDEDocumentConfig.USE_PACE_INSTEAD_OF_BAC && paceInfo != null) {
+        if (paceInfo != null) {
             doPACE()
             if (paceSucceeded) {
                 selectApplet()
@@ -87,7 +91,7 @@ class RDEDocument(private val documentName: String, private val bacKey: BACKey) 
         try {
             passportService.getInputStream(
                 PassportService.EF_CARD_ACCESS,
-                RDEDocumentConfig.MAX_BLOCK_SIZE
+                passportService.maxReadBinaryLength
             ).use { inputStream ->
                 cardAccessFile = CardAccessFile(inputStream)
                 logger.info("EF.CardAccess read successfully")
@@ -169,19 +173,19 @@ class RDEDocument(private val documentName: String, private val bacKey: BACKey) 
 
     private fun readEFSOD() {
         efSOD = SODFile(passportService.getInputStream(PassportService.EF_SOD,
-            RDEDocumentConfig.MAX_BLOCK_SIZE
+            passportService.maxReadBinaryLength
         ))
         logger.info("EF.SOD read successfully")
     }
     private fun readDG1() {
         dg1 = DG1File(passportService.getInputStream(PassportService.EF_DG1,
-            RDEDocumentConfig.MAX_BLOCK_SIZE
+            passportService.maxReadBinaryLength
         ))
         logger.info("DG1 read successfully")
     }
     private fun readDG2() {
         dg2 = DG2File(passportService.getInputStream(PassportService.EF_DG2,
-            RDEDocumentConfig.MAX_BLOCK_SIZE
+            passportService.maxReadBinaryLength
         ))
         logger.info("DG2 read successfully")
 
@@ -195,7 +199,7 @@ class RDEDocument(private val documentName: String, private val bacKey: BACKey) 
     }
     private fun readDG14() {
         dg14 = DG14File(passportService.getInputStream(PassportService.EF_DG14,
-            RDEDocumentConfig.MAX_BLOCK_SIZE
+            passportService.maxReadBinaryLength
         ))
         logger.info("DG14 read successfully")
 
@@ -204,12 +208,6 @@ class RDEDocument(private val documentName: String, private val bacKey: BACKey) 
         securityInfo = dg14.securityInfos
         parseSecurityInfo()
     }
-    private fun readDG15() {
-        dg15 = DG15File(passportService.getInputStream(PassportService.EF_DG15,
-            RDEDocumentConfig.MAX_BLOCK_SIZE
-        ))
-        logger.info("DG15 read successfully")
-    }
 
     private fun doPassiveAuth() {
         // See ICAO Doc 9303 (8th edition, 2021), Part 11, Section 5.1
@@ -217,7 +215,7 @@ class RDEDocument(private val documentName: String, private val bacKey: BACKey) 
 
         val dataGroupIntegrityVerified = verifyDGHashes()
         val efSODIntegrityVerified = verifySODHash()
-        val efSODCertificateVerified = verifySODCertificate()
+        val efSODCertificateVerified =  true // TODO: verify SOD certificate. This requires a trusted list of root certificates, which we don't maintain in this app
 
         if (dataGroupIntegrityVerified && efSODIntegrityVerified && efSODCertificateVerified) {
             paSucceeded = true
@@ -245,10 +243,6 @@ class RDEDocument(private val documentName: String, private val bacKey: BACKey) 
             val computedHash: ByteArray = digest.digest(dg14.encoded)
             if (!Arrays.equals(computedHash, dataHashes[14])) throw IllegalStateException("DG14 hash mismatch")
         }
-        if (::dg15.isInitialized){
-            val computedHash: ByteArray = digest.digest(dg15.encoded)
-            if (!Arrays.equals(computedHash, dataHashes[15])) throw IllegalStateException("DG15 hash mismatch")
-        }
         logger.info("DG hashes verified successfully")
         return true
     }
@@ -263,12 +257,6 @@ class RDEDocument(private val documentName: String, private val bacKey: BACKey) 
         if (!verified) throw IllegalStateException("SOD hash verification failed")
         logger.info("SOD hash verified successfully")
         return verified
-    }
-
-    private fun verifySODCertificate(): Boolean {
-        // TODO implement
-
-        return true
     }
 
     private fun doRBCall(dgId: Int, length: Int): ByteArray {
@@ -286,31 +274,48 @@ class RDEDocument(private val documentName: String, private val bacKey: BACKey) 
         return rbResponseData
     }
 
-    fun enroll() : RDEEnrollmentParameters {
+    fun enroll(documentName : String, rdeDGId : Int, rdeRBLength : Int, withSecurityData: Boolean = true, withMRZData: Boolean = true, withFaceImage: Boolean = false) : RDEEnrollmentParameters {
         if (!paceSucceeded && !bacSucceeded) throw IllegalStateException("PACE or BAC must be performed before CA")
+        if (rdeDGId > 15 || rdeDGId < 1) throw IllegalArgumentException("rdeDGId must be between 1 and 15 (and must be a data group that is present on the passport that can be read without terminal authentication)")
+        if (rdeRBLength > passportService.maxReadBinaryLength || rdeRBLength < 1) throw IllegalArgumentException("rdeRBLength must be between 1 and ${passportService.maxReadBinaryLength}")
 
-        readEFSOD()
-        readDG1()
-//        readDG2()
-        readDG14()
-        readDG15()
+        readEFSOD() // needed for passive authentication, so always do this regardless of whether we're doing enrollment withSecurityData
+        readDG14() // required to get security info for the CA session
+
+        if (withMRZData) {
+            readDG1()
+        }
+        if (withFaceImage) {
+            readDG2()
+        }
 
         try {
-            doPassiveAuth()
+            doPassiveAuth() // TODO it is questionable whether this is needed for RDE enrollment. If we want to enrollment withSecurityData, the keyserver and end user should do this anyway, so we could just skip it here
         } catch (e: Exception) {
-            logger.warning("Passive authentication failed, trying active authentication: $e")
+            logger.warning("Passive authentication failed, continuing anyway: $e")
         }
 
         doCA(caInfo!!, caPublicKeyInfo!!)
 
-        val rbResponseData = doRBCall(
-            RDEDocumentConfig.DG_ID_FOR_RDE,
-            RDEDocumentConfig.MAX_BLOCK_SIZE
+        val caOid = caInfo!!.objectIdentifier
+        val rbResponse = doRBCall(rdeDGId, rdeRBLength)
+        val rdeDGContent = Hex.toHexString(rbResponse)
+        val piccPublicKeyData = Hex.toHexString(caPublicKeyInfo!!.subjectPublicKey.encoded)
+        val mrzData = if (withMRZData) Hex.toHexString(dg1.encoded) else null
+        val faceImageData = if (withFaceImage) Hex.toHexString(faceImageBytes) else null
+        val securityData = if (withSecurityData) Hex.toHexString(efSOD.encoded) else null
+
+        return RDEEnrollmentParameters(
+            documentName,
+            caOid,
+            piccPublicKeyData,
+            rdeDGId,
+            rdeRBLength,
+            rdeDGContent,
+            securityData,
+            mrzData,
+            faceImageData,
         )
-
-        passportService.close()
-
-        return RDEEnrollmentParameters(RDEDocumentConfig.MAX_BLOCK_SIZE, RDEDocumentConfig.DG_ID_FOR_RDE, Hex.toHexString(rbResponseData), caInfo!!.objectIdentifier, Hex.toHexString(caPublicKeyInfo!!.subjectPublicKey.encoded), documentName)
     }
 
     fun decrypt(parameters: RDEDecryptionParameters) : ByteArray {
@@ -336,9 +341,13 @@ class RDEDocument(private val documentName: String, private val bacKey: BACKey) 
         return getDecryptionKeyFromAPDUResponse(response.bytes)
     }
 
+    fun close() {
+        passportService.close()
+    }
+
     companion object {
         fun readBinaryCommand(fid :  Int, length : Int) : CommandAPDU {
-            return getReadBinaryAPDU(fid, 0, length, RDEDocumentConfig.SFI_ENABLED, false)
+            return getReadBinaryAPDU(fid, 0, length, true, false)
         }
         private fun getReadBinaryAPDU(
             sfi: Int,

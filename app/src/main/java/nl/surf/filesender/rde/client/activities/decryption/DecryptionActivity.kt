@@ -3,7 +3,6 @@ package nl.surf.filesender.rde.client.activities.decryption
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import io.ktor.client.*
 import io.ktor.client.engine.okhttp.*
@@ -13,12 +12,11 @@ import io.ktor.websocket.*
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
-import net.sf.scuba.util.Hex
 import nl.surf.filesender.rde.client.activities.MainActivity
 import nl.surf.filesender.rde.client.activities.general.ScanQRActivity
 import nl.surf.filesender.rde.client.handshake.DecryptionHandshakeProtocol
 import nl.surf.filesender.rde.data.RDEDecryptionParameters
-import nl.surf.filesender.rde.data.RDEDocumentMRZData
+import nl.surf.filesender.rde.client.RDEDocumentMRZData
 
 
 class DecryptionActivity : AppCompatActivity() {
@@ -34,7 +32,7 @@ class DecryptionActivity : AppCompatActivity() {
     private lateinit var handshake : DecryptionHandshakeProtocol
     private lateinit var decryptionParams: RDEDecryptionParameters
     private lateinit var mrzData: RDEDocumentMRZData
-    private lateinit var retrievedKey: String
+    private lateinit var retrievedKey: ByteArray
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -73,7 +71,7 @@ class DecryptionActivity : AppCompatActivity() {
 
     private fun sendRetrievedKey() {
         runBlocking {
-            handshake.sendData(Hex.hexStringToBytes(retrievedKey))
+            handshake.sendData(retrievedKey)
         }
         finish()
     }
@@ -86,8 +84,7 @@ class DecryptionActivity : AppCompatActivity() {
                 Log.d("DecryptionActivity", "Received socket url: $socketUrl")
                 startDecryption()
             } else if (resultCode == RESULT_CANCELED) {
-                Toast.makeText(this, "Failed, retry.", Toast.LENGTH_SHORT).show()
-                launchQRScanner()
+                finish()
             }
         }
         if (requestCode == LAUNCH_MRZ_INPUT) {
@@ -96,18 +93,16 @@ class DecryptionActivity : AppCompatActivity() {
                 Log.d("DecryptionActivity", "Received MRZ data: $mrzData")
                 launchReadNFC()
             } else if (resultCode == RESULT_CANCELED) {
-                Toast.makeText(this, "Failed, retry.", Toast.LENGTH_SHORT).show()
-                launchMRZInput()
+                launchQRScanner()
             }
         }
         if (requestCode == LAUNCH_READ_NFC) {
             if (resultCode == RESULT_OK) {
-                retrievedKey = data?.getStringExtra("result")!!
+                retrievedKey = data?.getByteArrayExtra("result")!!
                 Log.d("DecryptionActivity", "Received key: $retrievedKey")
                 sendRetrievedKey()
             } else if (resultCode == RESULT_CANCELED) {
-                Toast.makeText(this, "Failed, retry.", Toast.LENGTH_SHORT).show()
-                launchReadNFC()
+                launchMRZInput()
             }
         }
     }

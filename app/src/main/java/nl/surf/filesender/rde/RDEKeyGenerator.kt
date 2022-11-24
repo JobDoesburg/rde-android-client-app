@@ -5,6 +5,7 @@ import nl.surf.filesender.rde.data.RDEDecryptionParameters
 import nl.surf.filesender.rde.data.RDEEnrollmentParameters
 import nl.surf.filesender.rde.data.RDEKey
 import org.bouncycastle.jce.provider.BouncyCastleProvider
+import org.jmrtd.PassportService
 import org.jmrtd.Util
 import org.jmrtd.lds.ChipAuthenticationInfo
 import org.jmrtd.protocol.EACCAProtocol
@@ -36,7 +37,7 @@ class RDEKeyGenerator(var enrollmentParams: RDEEnrollmentParameters) {
 
         val encryptionKey = deriveEncryptionKey(sharedSecret)
         val protectedCommand = generateProtectedCommand(sharedSecret)
-        val decryptionParams = RDEDecryptionParameters(oid, Hex.toHexString(pcdPublicKey.encoded), Hex.toHexString(protectedCommand))
+        val decryptionParams = RDEDecryptionParameters(enrollmentParams.documentName, oid, Hex.toHexString(pcdPublicKey.encoded), Hex.toHexString(protectedCommand))
         return RDEKey(encryptionKey, decryptionParams)
     }
 
@@ -47,7 +48,7 @@ class RDEKeyGenerator(var enrollmentParams: RDEEnrollmentParameters) {
     private fun deriveEncryptionKey(sharedSecret : ByteArray) : ByteArray {
         val ksEnc = Util.deriveKey(sharedSecret, cipherAlg, keyLength, Util.ENC_MODE)
         val ksMac = Util.deriveKey(sharedSecret, cipherAlg, keyLength, Util.MAC_MODE)
-        val emulatedResponse = AESAPDUEncoder(ksEnc.encoded, ksMac.encoded).write(Hex.hexStringToBytes(enrollmentParams.Fcont))
+        val emulatedResponse = AESAPDUEncoder(ksEnc.encoded, ksMac.encoded).write(Hex.hexStringToBytes(enrollmentParams.rdeDGContent))
         return RDEDocument.getDecryptionKeyFromAPDUResponse(emulatedResponse)
     }
 
@@ -56,12 +57,12 @@ class RDEKeyGenerator(var enrollmentParams: RDEEnrollmentParameters) {
      * @param sharedSecret the shared secret
      */
     private fun generateProtectedCommand(sharedSecret : ByteArray) : ByteArray {
-        val rbCommand = RDEDocument.readBinaryCommand(enrollmentParams.Fid, enrollmentParams.n)
+        val rbCommand = RDEDocument.readBinaryCommand(enrollmentParams.rdeDGId, enrollmentParams.rdeRBLength)
         val protectedCommand = RDEDocument.encryptCommand(
             rbCommand,
             oid,
             sharedSecret,
-            RDEDocumentConfig.TRANCEIVE_LENGTH_FOR_SECURE_MESSAGING
+            PassportService.NORMAL_MAX_TRANCEIVE_LENGTH
         )
         return protectedCommand.bytes
     }

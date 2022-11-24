@@ -9,14 +9,14 @@ import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import nl.surf.filesender.rde.client.R
-import nl.surf.filesender.rde.data.RDEDocumentMRZData
+import nl.surf.filesender.rde.client.RDEDocumentMRZData
 import java.util.*
 
 open class ReadMRZActivity : AppCompatActivity() {
     private lateinit var documentIdField: EditText
     private lateinit var dateOfBirthField: EditText
     private lateinit var dateOfExpiryField: EditText
-    private lateinit var documentNameField: EditText
+    internal lateinit var documentNameField: EditText
     // TODO: store the most recent MRZ Data for better usability
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -58,17 +58,28 @@ open class ReadMRZActivity : AppCompatActivity() {
         }
     }
 
-    private fun validateMRZData(): RDEDocumentMRZData? {
+    open fun validateMRZData(): RDEDocumentMRZData? {
         val documentId = documentIdField.text.toString()
         val dateOfBirth = dateOfBirthField.text.toString()
         val dateOfExpiry = dateOfExpiryField.text.toString()
-        val documentName = documentNameField.text.toString()
 
-        if (documentId.length != 9 || dateOfBirth.length != 6 || dateOfExpiry.length != 6 || documentName.isEmpty()) {
+        if (documentId.length != 9) {
+            documentIdField.error = "Document ID must be 9 characters long"
+            return null
+        }
+        if (dateOfBirth.length != 6) {
+            dateOfBirthField.error = "Date of birth must be 6 characters long"
+            return null
+        }
+        if (dateOfExpiry.length != 6) {
+            dateOfExpiryField.error = "Date of expiry must be 6 characters long"
             return null
         }
 
         return RDEDocumentMRZData(documentId = documentId, dateOfBirth = dateOfBirth, dateOfExpiry = dateOfExpiry)
+    }
+
+    open fun addIntentExtras(intent: Intent) {
     }
 
     private fun onNextButtonClick() {
@@ -81,6 +92,7 @@ open class ReadMRZActivity : AppCompatActivity() {
         val resultIntent = Intent()
         resultIntent.putExtra("result", mrzData);
         setResult(Activity.RESULT_OK, resultIntent);
+        addIntentExtras(resultIntent)
         finish();
     }
 

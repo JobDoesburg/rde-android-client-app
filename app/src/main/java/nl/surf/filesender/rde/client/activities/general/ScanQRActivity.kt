@@ -20,7 +20,7 @@ open class ScanQRActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_enrollment_scan_qractivity)
+        setContentView(R.layout.activity_scan_qr)
         codeScannerView = findViewById(R.id.scanner_view)
 
         startQRScanner()
