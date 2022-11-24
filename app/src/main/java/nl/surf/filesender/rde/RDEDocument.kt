@@ -349,6 +349,8 @@ class RDEDocument(private val bacKey: BACKey) {
         fun readBinaryCommand(fid :  Int, length : Int) : CommandAPDU {
             return getReadBinaryAPDU(fid, 0, length, true, false)
         }
+
+        // TODO this is copied from jmrtd, should be refactored to be made easier, or attribute to jmrtd
         private fun getReadBinaryAPDU(
             sfi: Int,
             offset: Int,
