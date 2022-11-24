@@ -301,9 +301,9 @@ class RDEDocument(private val bacKey: BACKey) {
         val rbResponse = doRBCall(rdeDGId, rdeRBLength)
         val rdeDGContent = Hex.toHexString(rbResponse)
         val piccPublicKeyData = Hex.toHexString(caPublicKeyInfo!!.subjectPublicKey.encoded)
-        val mrzData = if (withMRZData) Hex.toHexString(dg1.encoded) else null
-        val faceImageData = if (withFaceImage) Hex.toHexString(faceImageBytes) else null
-        val securityData = if (withSecurityData) Hex.toHexString(efSOD.encoded) else null
+        val securityData = if (withSecurityData) Hex.toHexString(efSOD.encoded).replace("\n", "") else null
+        val mrzData = if (withMRZData) Hex.toHexString(dg1.encoded).replace("\n", "") else null
+        val faceImageData = if (withFaceImage) Hex.toHexString(faceImageBytes).replace("\n", "") else null
 
         return RDEEnrollmentParameters(
             documentName,
