@@ -44,6 +44,7 @@ class EnrollmentReadNFCActivity : ReadNFCActivity() {
 
         document.init(cardService)
         document.open()
+        // TODO detect the document version and country, only use withMRZData for certain versions
         val enrollmentParams = document.enroll(enrollmentDocumentName, RDE_DG_ID, RDE_RB_LENGTH, withSecurityData = true, withMRZData = true, withFaceImage = true)
         document.close()
 
