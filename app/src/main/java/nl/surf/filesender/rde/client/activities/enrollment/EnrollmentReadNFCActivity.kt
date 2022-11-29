@@ -72,8 +72,10 @@ class EnrollmentReadNFCActivity : ReadNFCActivity() {
 
         if (withMRZData && enrollmentParams.mrzData != null && document.dg1.mrzInfo.personalNumber != null) {
             // The MRZ data contains a privacy sensitive field that we may not process, so we remove the MRZ data
-            enrollmentParams.mrzData = null
-            Toast.makeText(this, "MRZ data contains personal number, proceeding without MRZ data", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, "MRZ data contains personal number, cannot include MRZ data", Toast.LENGTH_LONG).show()
+            setResult(Activity.RESULT_CANCELED)
+            finish()
+            return
         }
 
         document.close()
