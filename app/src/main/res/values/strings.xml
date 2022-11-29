@@ -13,4 +13,7 @@
     <string name="document_name_preview">My passport</string>
     <string name="present_document_nfc">Please place the document against the back of your phone so it can be read via NFC</string>
     <string name="scan_qr_code_text">Scan QR code</string>
+    <string name='with_security_data_checkbox_text'>with security data</string>
+    <string name='with_mrz_data_checkbox_text'>with MRZ data</string>
+    <string name='with_face_image_data_checkbox_text'>with face image</string>
 </resources>

@@ -3,6 +3,7 @@ package nl.surf.filesender.rde.client.activities.decryption
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import io.ktor.client.*
 import io.ktor.client.engine.okhttp.*
@@ -17,6 +18,7 @@ import nl.surf.filesender.rde.client.activities.general.ScanQRActivity
 import nl.surf.filesender.rde.client.handshake.DecryptionHandshakeProtocol
 import nl.surf.filesender.rde.data.RDEDecryptionParameters
 import nl.surf.filesender.rde.client.RDEDocumentMRZData
+import nl.surf.filesender.rde.client.activities.general.ReadMRZActivity
 
 
 class DecryptionActivity : AppCompatActivity() {
@@ -45,8 +47,8 @@ class DecryptionActivity : AppCompatActivity() {
     }
 
     private fun launchMRZInput() {
-        val intent = Intent(this, DecryptionReadMRZActivity::class.java)
-//        intent.putExtra("documentName", decryptionParams.documentName) // TODO add document name to decryption params
+        val intent = Intent(this, ReadMRZActivity::class.java)
+        Toast.makeText(this, "This document is encrypted with ${decryptionParams.documentName}", Toast.LENGTH_LONG).show()
         startActivityForResult(intent, LAUNCH_MRZ_INPUT)
     }
 

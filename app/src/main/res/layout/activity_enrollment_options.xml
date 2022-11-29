@@ -21,76 +21,52 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
+
         <TextView
-            android:id="@+id/documentIdLabel"
+            android:id="@+id/documentNameLabel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:labelFor="@id/documentId"
-            android:text="@string/document_id"
-            tools:text="@string/document_id" />
+            android:text="@string/document_name"
+            tools:text="@string/document_name" />
 
         <EditText
-            android:id="@+id/documentId"
+            android:id="@+id/documentName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:capitalize="sentences"
             android:ems="10"
-            android:hint="@string/document_id_preview"
+            android:hint="@string/document_name_preview"
             android:importantForAutofill="no"
-            android:inputType="textShortMessage|textNoSuggestions|textCapCharacters"
+            android:inputType="textAutoCorrect"
             android:minHeight="48dp"
-            android:selectAllOnFocus="true"
             android:singleLine="true"
-            android:textColorHint="#757575"
-            tools:ignore="DuplicateSpeakableTextCheck" />
+            android:textColorHint="#757575" />
 
-        <TextView
-            android:id="@+id/dateOfBirthLabel"
+        <CheckBox
+            android:id="@+id/withSecurityDataCheckBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:labelFor="@id/dateOfBirth"
-            android:text="@string/date_of_birth"
-            tools:text="@string/date_of_birth" />
+            android:text="@string/with_security_data_checkbox_text" />
 
-        <EditText
-            android:id="@+id/dateOfBirth"
+        <CheckBox
+            android:id="@+id/withMRZDataCheckBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:clickable="false"
-            android:ems="10"
-            android:hint="@string/date_of_birth_preview"
-            android:importantForAutofill="no"
-            android:inputType="date"
-            android:minHeight="48dp"
-            android:textColorHint="#757575"
-            tools:ignore="DuplicateSpeakableTextCheck" />
+            android:text="@string/with_mrz_data_checkbox_text" />
 
-        <TextView
-            android:id="@+id/dateOfExpiryLabel"
+        <CheckBox
+            android:id="@+id/withFaceImageDataCheckBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:labelFor="@id/dateOfExpiry"
-            android:text="@string/date_of_expiry"
-            tools:text="@string/date_of_expiry" />
-
-        <EditText
-            android:id="@+id/dateOfExpiry"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:clickable="false"
-            android:datePickerMode="calendar"
-            android:ems="10"
-            android:hint="@string/date_of_expiry_preview"
-            android:importantForAutofill="no"
-            android:inputType="date"
-            android:minHeight="48dp"
-            android:textColorHint="#757575"
-            tools:ignore="DuplicateSpeakableTextCheck" />
+            android:text="@string/with_face_image_data_checkbox_text" />
 
         <Button
             android:id="@+id/nextButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/next_button_text" />
+
+
 
     </LinearLayout>
 

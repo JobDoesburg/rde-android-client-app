@@ -10,7 +10,6 @@
     <uses-feature
         android:name="android.hardware.camera"
         android:required="true" />
-
     <uses-feature
         android:name="android.hardware.nfc"
         android:required="true" />
@@ -25,7 +24,6 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SURFfilesenderRDEclientAndroid"
         tools:targetApi="31">
-
         <activity
             android:name=".activities.MainActivity"
             android:exported="true">
@@ -51,13 +49,10 @@
             android:name=".activities.general.ReadMRZActivity"
             android:exported="false" />
         <activity
-            android:name=".activities.enrollment.EnrollmentReadMRZActivity"
+            android:name=".activities.enrollment.EnrollmentOptionsActivity"
             android:exported="false" />
         <activity
             android:name=".activities.enrollment.EnrollmentReadNFCActivity"
-            android:exported="false" />
-        <activity
-            android:name=".activities.decryption.DecryptionReadMRZActivity"
             android:exported="false" />
         <activity
             android:name=".activities.decryption.DecryptionReadNFCActivity"

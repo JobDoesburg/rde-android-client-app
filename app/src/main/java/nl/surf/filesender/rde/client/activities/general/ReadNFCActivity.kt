@@ -17,7 +17,6 @@ import java.security.Security
 open class ReadNFCActivity : AppCompatActivity() {
     var nfcAdapter: NfcAdapter? = null
     var bacKey: BACKey? = null
-    var documentName: String? = null
 
     var tag: Tag? = null
 
@@ -39,9 +38,6 @@ open class ReadNFCActivity : AppCompatActivity() {
         val mrzData = intent.extras!!["mrzData"] as RDEDocumentMRZData
         mrzData.toBACKey()
         bacKey = mrzData.toBACKey()
-
-        documentName = intent.getStringExtra("documentName")
-        Log.d("ReadNFCActivity", "Document name: $documentName")
     }
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)

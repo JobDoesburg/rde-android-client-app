@@ -14,6 +14,11 @@ import nl.surf.filesender.rde.RDEDocument
 import nl.surf.filesender.rde.client.activities.general.ReadNFCActivity
 
 class EnrollmentReadNFCActivity : ReadNFCActivity() {
+    private lateinit var documentName: String
+    private var withSecurityData = false
+    private var withMRZData = false
+    private var withFaceImageData = false
+
     companion object {
         const val RDE_DG_ID = 14
         const val RDE_RB_LENGTH = 223
@@ -22,17 +27,29 @@ class EnrollmentReadNFCActivity : ReadNFCActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_read_nfc)
+
+        documentName = intent.getStringExtra("documentName")!!
+        withSecurityData = intent.getBooleanExtra("withSecurityData", false)
+        withMRZData = intent.getBooleanExtra("withMRZData", false)
+        withFaceImageData = intent.getBooleanExtra("withFaceImageData", false)
     }
 
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
 
-        enroll()
-        Toast.makeText(this, "Done", Toast.LENGTH_LONG).show()
-        Log.d("EnrollmentReadNFC", "Enrollment done")
+        try {
+            enroll(documentName, withSecurityData, withMRZData, withFaceImageData)
+            Toast.makeText(this, "Done", Toast.LENGTH_LONG).show()
+            Log.d("EnrollmentReadNFC", "Enrollment done")
+        } catch (e: Exception) {
+            Toast.makeText(this, "Error: ${e.message}", Toast.LENGTH_LONG).show()
+            Log.e("EnrollmentReadNFC", "Error: ${e.message}")
+            setResult(Activity.RESULT_CANCELED)
+            finish()
+        }
     }
 
-    private fun enroll(withSecurityData: Boolean = true, withMRZData: Boolean = true, withFaceImage: Boolean = true){
+    private fun enroll(documentName: String, withSecurityData: Boolean = true, withMRZData: Boolean = true, withFaceImage: Boolean = true){
         val document = RDEDocument(bacKey!!)
 
         val isoDep = IsoDep.get(tag)

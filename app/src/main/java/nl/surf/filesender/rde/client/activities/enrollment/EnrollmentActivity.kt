@@ -14,7 +14,9 @@ import nl.surf.filesender.rde.client.activities.MainActivity
 import nl.surf.filesender.rde.client.activities.decryption.DecryptionActivity
 import nl.surf.filesender.rde.client.activities.general.ScanQRActivity
 import nl.surf.filesender.rde.client.RDEDocumentMRZData
+import nl.surf.filesender.rde.client.activities.general.ReadMRZActivity
 import nl.surf.filesender.rde.data.RDEEnrollmentParameters
+import kotlin.properties.Delegates
 
 class EnrollmentActivity : AppCompatActivity() {
     private val client = HttpClient(OkHttp) { // We need to use OkHttp because of DNS + IPv6 issues with CIO engine
@@ -25,8 +27,13 @@ class EnrollmentActivity : AppCompatActivity() {
 
     private lateinit var socketUrl : String
     private lateinit var mrzData: RDEDocumentMRZData
-    private lateinit var documentName: String
     private lateinit var enrollmentParams: RDEEnrollmentParameters
+    private lateinit var documentName: String
+    private var withSecurityData = false
+    private var withMRZData = false
+    private var withFaceImageData = false
+
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,19 +42,27 @@ class EnrollmentActivity : AppCompatActivity() {
 
     fun launchQRScanner() {
         val intent = Intent(this, ScanQRActivity::class.java)
-        startActivityForResult(intent, DecryptionActivity.LAUNCH_QR_SCANNER)
+        startActivityForResult(intent, LAUNCH_QR_SCANNER)
     }
 
     private fun launchMRZInput() {
-        val intent = Intent(this, EnrollmentReadMRZActivity::class.java)
-        startActivityForResult(intent, DecryptionActivity.LAUNCH_MRZ_INPUT)
+        val intent = Intent(this, ReadMRZActivity::class.java)
+        startActivityForResult(intent, LAUNCH_MRZ_INPUT)
+    }
+
+    private fun launchEnrollmentOptionsInput() {
+        val intent = Intent(this, EnrollmentOptionsActivity::class.java)
+        startActivityForResult(intent, LAUNCH_OPTIONS)
     }
 
     private fun launchReadNFC() {
         val intent = Intent(this, EnrollmentReadNFCActivity::class.java)
         intent.putExtra("mrzData", mrzData)
         intent.putExtra("documentName", documentName)
-        startActivityForResult(intent, DecryptionActivity.LAUNCH_READ_NFC)
+        intent.putExtra("withSecurityData", withSecurityData)
+        intent.putExtra("withMRZData", withMRZData)
+        intent.putExtra("withFaceImageData", withFaceImageData)
+        startActivityForResult(intent, LAUNCH_READ_NFC)
     }
 
     private fun performEnrollment() {
@@ -73,10 +88,20 @@ class EnrollmentActivity : AppCompatActivity() {
         if (requestCode == LAUNCH_MRZ_INPUT) {
             if (resultCode == RESULT_OK) {
                 mrzData = data?.extras!!["result"] as RDEDocumentMRZData
-                documentName = data.getStringExtra("documentName")!!
-                launchReadNFC()
+                launchEnrollmentOptionsInput()
             } else if (resultCode == RESULT_CANCELED) {
                 launchQRScanner()
+            }
+        }
+        if (requestCode == LAUNCH_OPTIONS) {
+            if (resultCode == RESULT_OK) {
+                documentName = data?.getStringExtra("documentName")!!
+                withSecurityData = data.getBooleanExtra("withSecurityData", false)
+                withMRZData = data.getBooleanExtra("withMRZData", false)
+                withFaceImageData = data.getBooleanExtra("withFaceImageData", false)
+                launchReadNFC()
+            } else if (resultCode == RESULT_CANCELED) {
+                launchMRZInput()
             }
         }
         if (requestCode == LAUNCH_READ_NFC) {
@@ -99,7 +124,8 @@ class EnrollmentActivity : AppCompatActivity() {
     companion object {
         const val LAUNCH_QR_SCANNER = 1
         const val LAUNCH_MRZ_INPUT = 2
-        const val LAUNCH_READ_NFC = 3
+        const val LAUNCH_OPTIONS = 3
+        const val LAUNCH_READ_NFC = 4
     }
 
 }

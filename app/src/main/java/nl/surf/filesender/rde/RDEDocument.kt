@@ -98,8 +98,8 @@ class RDEDocument(private val bacKey: BACKey) { // TODO add CAN support
                 securityInfo = cardAccessFile.securityInfos
                 parseSecurityInfo()
             }
-        } catch (e: CardServiceException) {
-            throw IllegalStateException("Could not read security info", e)
+        } catch (e: Exception) {
+            logger.warning("Could not read security info")
         }
     }
 
@@ -304,7 +304,7 @@ class RDEDocument(private val bacKey: BACKey) { // TODO add CAN support
         try {
             doPassiveAuth() // TODO it is questionable whether this is needed for RDE enrollment. If we want to enrollment withSecurityData, the keyserver and end user should do this anyway, so we could just skip it here
         } catch (e: Exception) {
-            logger.warning("Passive authentication failed, continuing anyway: $e")
+            logger.warning("Passive authentication failed, continuing anyway: $e") // TODO we should definitely not continue if this fails
         }
 
         doCA(caInfo!!, caPublicKeyInfo!!)

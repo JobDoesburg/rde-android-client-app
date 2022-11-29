@@ -63,8 +63,6 @@ open class ScanQRActivity : AppCompatActivity() {
     }
 
     open fun processQRCodeScan(data: String) {
-        Toast.makeText(this, "QR Code Scanned", Toast.LENGTH_LONG).show()
-
         val resultIntent = Intent()
         resultIntent.putExtra("result", data);
         setResult(Activity.RESULT_OK, resultIntent);

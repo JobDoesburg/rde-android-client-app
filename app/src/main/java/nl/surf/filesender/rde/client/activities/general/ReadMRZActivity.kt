@@ -16,7 +16,6 @@ open class ReadMRZActivity : AppCompatActivity() {
     private lateinit var documentIdField: EditText
     private lateinit var dateOfBirthField: EditText
     private lateinit var dateOfExpiryField: EditText
-    internal lateinit var documentNameField: EditText
     // TODO: store the most recent MRZ Data for better usability
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -26,13 +25,12 @@ open class ReadMRZActivity : AppCompatActivity() {
         documentIdField = findViewById(R.id.documentId)
         dateOfBirthField = findViewById(R.id.dateOfBirth)
         dateOfExpiryField = findViewById(R.id.dateOfExpiry)
-        documentNameField = findViewById(R.id.documentName)
 
         addDatePickerDialog(dateOfBirthField)
         addDatePickerDialog(dateOfExpiryField)
 
-        val enrollmentButtonClick = findViewById<Button>(R.id.nextButton)
-        enrollmentButtonClick.setOnClickListener {
+        val nextButton = findViewById<Button>(R.id.nextButton)
+        nextButton.setOnClickListener {
             onNextButtonClick()
         }
     }
@@ -79,8 +77,6 @@ open class ReadMRZActivity : AppCompatActivity() {
         return RDEDocumentMRZData(documentId = documentId, dateOfBirth = dateOfBirth, dateOfExpiry = dateOfExpiry)
     }
 
-    open fun addIntentExtras(intent: Intent) {
-    }
 
     private fun onNextButtonClick() {
         val mrzData = validateMRZData()
@@ -92,7 +88,6 @@ open class ReadMRZActivity : AppCompatActivity() {
         val resultIntent = Intent()
         resultIntent.putExtra("result", mrzData);
         setResult(Activity.RESULT_OK, resultIntent);
-        addIntentExtras(resultIntent)
         finish();
     }
 
