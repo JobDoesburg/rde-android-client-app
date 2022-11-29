@@ -32,11 +32,21 @@ class EnrollmentOptionsActivity : AppCompatActivity() {
     }
 
     private fun onNextButtonClick() {
+        val documentName = documentNameField.text.toString()
+        val withSecurityData = withSecurityDataCheckBox.isChecked
+        val withMRZData = withMRZDataCheckBox.isChecked
+        val withFaceImageData = withFaceImageDataCheckBox.isChecked
+
+        if (documentName.isEmpty() || documentName.isBlank()) {
+            Toast.makeText(this, "Document name is required", Toast.LENGTH_SHORT).show()
+            return
+        }
+
         val resultIntent = Intent()
-        resultIntent.putExtra("documentName", documentNameField.text.toString());
-        resultIntent.putExtra("withSecurityData", withSecurityDataCheckBox.isChecked);
-        resultIntent.putExtra("withMRZData", withMRZDataCheckBox.isChecked);
-        resultIntent.putExtra("withFaceImageData", withFaceImageDataCheckBox.isChecked);
+        resultIntent.putExtra("documentName", documentName);
+        resultIntent.putExtra("withSecurityData", withSecurityData);
+        resultIntent.putExtra("withMRZData", withMRZData);
+        resultIntent.putExtra("withFaceImageData", withFaceImageData);
         setResult(Activity.RESULT_OK, resultIntent);
         finish();
     }

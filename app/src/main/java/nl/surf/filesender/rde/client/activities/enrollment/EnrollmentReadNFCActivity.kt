@@ -66,8 +66,16 @@ class EnrollmentReadNFCActivity : ReadNFCActivity() {
 
         document.init(cardService)
         document.open()
-        // TODO detect the document version and country, only use withMRZData for certain versions
+        // TODO detect the document version and country beforehand, only use withMRZData for certain versions
+
         val enrollmentParams = document.enroll(enrollmentDocumentName, RDE_DG_ID, RDE_RB_LENGTH, withSecurityData, withMRZData, withFaceImage)
+
+        if (withMRZData && enrollmentParams.mrzData != null && document.dg1.mrzInfo.personalNumber != null) {
+            // The MRZ data contains a privacy sensitive field that we may not process, so we remove the MRZ data
+            enrollmentParams.mrzData = null
+            Toast.makeText(this, "MRZ data contains personal number, proceeding without MRZ data", Toast.LENGTH_LONG).show()
+        }
+
         document.close()
 
         val returnIntent = Intent()

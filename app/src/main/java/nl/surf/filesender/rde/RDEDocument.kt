@@ -40,11 +40,11 @@ class RDEDocument(private val bacKey: BACKey) { // TODO add CAN support
     private var paSucceeded = false
     private var caSucceeded = false
 
-    private lateinit var efSOD : SODFile
-    private lateinit var dg1 : DG1File
-    private lateinit var dg2 : DG2File
-    private lateinit var faceImageBytes: ByteArray
-    private lateinit var dg14 : DG14File
+    lateinit var efSOD : SODFile
+    lateinit var dg1 : DG1File
+    lateinit var dg2 : DG2File
+    lateinit var faceImageBytes: ByteArray
+    lateinit var dg14 : DG14File
 
     private lateinit var pcdPublicKey : PublicKey
     private lateinit var pcdPrivateKey : PrivateKey
