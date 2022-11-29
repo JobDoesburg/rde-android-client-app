@@ -18,13 +18,13 @@ import javax.crypto.interfaces.DHPublicKey
  * Generator for RDE keys.
  */
 class RDEKeyGenerator(var enrollmentParams: RDEEnrollmentParameters) {
-    private val oid : String = enrollmentParams.caOid
-    private val agreementAlg: String = RDEDocument.agreementAlgFromCAOID(oid)
+    private val caOID : String = enrollmentParams.caOID
+    private val agreementAlg: String = RDEDocument.agreementAlgFromCAOID(caOID)
     private val piccPublicKey : PublicKey =
-        RDEDocument.decodePublicKey(oid, Hex.hexStringToBytes(enrollmentParams.piccPublicKey))
+        RDEDocument.decodePublicKey(caOID, Hex.hexStringToBytes(enrollmentParams.piccPublicKey))
     private val params : AlgorithmParameterSpec = paramsFromPublicKey(agreementAlg, piccPublicKey)
-    private val cipherAlg : String = ChipAuthenticationInfo.toCipherAlgorithm(oid)
-    private val keyLength : Int = ChipAuthenticationInfo.toKeyLength(oid)
+    private val cipherAlg : String = ChipAuthenticationInfo.toCipherAlgorithm(caOID)
+    private val keyLength : Int = ChipAuthenticationInfo.toKeyLength(caOID)
 
     /**
      * Generate a new RDE key.
@@ -37,7 +37,7 @@ class RDEKeyGenerator(var enrollmentParams: RDEEnrollmentParameters) {
 
         val encryptionKey = deriveEncryptionKey(sharedSecret)
         val protectedCommand = generateProtectedCommand(sharedSecret)
-        val decryptionParams = RDEDecryptionParameters(enrollmentParams.documentName, oid, Hex.toHexString(pcdPublicKey.encoded), Hex.toHexString(protectedCommand))
+        val decryptionParams = RDEDecryptionParameters(enrollmentParams.documentName, caOID, Hex.toHexString(pcdPublicKey.encoded), Hex.toHexString(protectedCommand))
         return RDEKey(encryptionKey, decryptionParams)
     }
 
@@ -60,7 +60,7 @@ class RDEKeyGenerator(var enrollmentParams: RDEEnrollmentParameters) {
         val rbCommand = RDEDocument.readBinaryCommand(enrollmentParams.rdeDGId, enrollmentParams.rdeRBLength)
         val protectedCommand = RDEDocument.encryptCommand(
             rbCommand,
-            oid,
+            caOID,
             sharedSecret,
             PassportService.NORMAL_MAX_TRANCEIVE_LENGTH
         )

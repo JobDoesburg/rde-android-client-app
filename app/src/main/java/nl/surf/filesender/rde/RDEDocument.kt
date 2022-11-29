@@ -22,7 +22,7 @@ import java.util.logging.Logger
 import kotlin.experimental.and
 
 
-class RDEDocument(private val bacKey: BACKey) {
+class RDEDocument(private val bacKey: BACKey) { // TODO add CAN support
     private val logger = Logger.getLogger(RDEDocument::class.java.name)
 
     private lateinit var passportService: PassportService
@@ -189,7 +189,7 @@ class RDEDocument(private val bacKey: BACKey) {
         ))
         logger.info("DG2 read successfully")
 
-        getFaceImage()
+//        getFaceImage() // TODO is this required? What is the difference with just reading dg2
     }
     private fun getFaceImage() {
         val outputStream = ByteArrayOutputStream()
@@ -253,7 +253,10 @@ class RDEDocument(private val bacKey: BACKey) {
                 initVerify(efSOD.docSigningCertificate)
                 update(efSOD.eContent)
             }
+        logger.info("efSOD.docSigningCertificate.encoded: ${Hex.toHexString(efSOD.docSigningCertificate.encoded)}")
+        logger.info("efSOD.eContent: ${Hex.toHexString(efSOD.eContent)}")
         val verified = s.verify(efSOD.encryptedDigest)
+        logger.info("efSOD.encryptedDigest: ${Hex.toHexString(efSOD.encryptedDigest)}")
         if (!verified) throw IllegalStateException("SOD hash verification failed")
         logger.info("SOD hash verified successfully")
         return verified
@@ -272,6 +275,15 @@ class RDEDocument(private val bacKey: BACKey) {
         val rbResponseData = getResponseData(unwrappedResponse,false)
         if (rbResponseData.size != length) throw IllegalStateException("RB response data length mismatch. Expected $length, got ${rbResponseData.size}")
         return rbResponseData
+    }
+
+    fun dgIdToDG(dgId: Int): DataGroup {
+        return when (dgId) {
+            1 -> dg1
+            2 -> dg2
+            14 -> dg14
+            else -> throw IllegalArgumentException("Unsupported DG ID $dgId")
+        }
     }
 
     fun enroll(documentName : String, rdeDGId : Int, rdeRBLength : Int, withSecurityData: Boolean = true, withMRZData: Boolean = true, withFaceImage: Boolean = false) : RDEEnrollmentParameters {
@@ -299,11 +311,14 @@ class RDEDocument(private val bacKey: BACKey) {
 
         val caOid = caInfo!!.objectIdentifier
         val rbResponse = doRBCall(rdeDGId, rdeRBLength)
-        val rdeDGContent = Hex.toHexString(rbResponse)
+        val rdeDGContent = if (withSecurityData) Hex.toHexString(dgIdToDG(rdeDGId).encoded) else Hex.toHexString(rbResponse) // If we include security data, we include the entire DG, because otherwise the dg hashes won't verify. Otherwise we just include the RB response that is shorter, because we don't need the full DG for simple RDE
+
         val piccPublicKeyData = Hex.toHexString(caPublicKeyInfo!!.subjectPublicKey.encoded)
         val securityData = if (withSecurityData) Hex.toHexString(efSOD.encoded).replace("\n", "") else null
         val mrzData = if (withMRZData) Hex.toHexString(dg1.encoded).replace("\n", "") else null
-        val faceImageData = if (withFaceImage) Hex.toHexString(faceImageBytes).replace("\n", "") else null
+//        val faceImageData = if (withFaceImage) Hex.toHexString(faceImageBytes).replace("\n", "") else null
+        val faceImageData = if (withFaceImage) Hex.toHexString(dg2.encoded).replace("\n", "") else null
+
 
         return RDEEnrollmentParameters(
             documentName,
@@ -329,8 +344,8 @@ class RDEDocument(private val bacKey: BACKey) {
             logger.warning("Passive authentication failed, trying active authentication: $e")
         }
 
-        val publicKey = decodePublicKey(parameters.oid, Hex.hexStringToBytes(parameters.publicKey))
-        doCustomCA(parameters.oid, publicKey)
+        val publicKey = decodePublicKey(parameters.caOID, Hex.hexStringToBytes(parameters.pcdPublicKey))
+        doCustomCA(parameters.caOID, publicKey)
 
         val protectedCommand = CommandAPDU(Hex.hexStringToBytes(parameters.protectedCommand))
         logger.info("Sending protected command: $protectedCommand")
