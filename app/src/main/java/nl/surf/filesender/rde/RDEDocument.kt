@@ -10,11 +10,13 @@ import org.jmrtd.PACEKeySpec
 import org.jmrtd.PassportService
 import org.jmrtd.lds.*
 import org.jmrtd.lds.icao.DG14File
-import org.jmrtd.lds.icao.DG15File
 import org.jmrtd.lds.icao.DG1File
 import org.jmrtd.lds.icao.DG2File
-import org.jmrtd.protocol.*
+import org.jmrtd.protocol.EACCAAPDUSender
+import org.jmrtd.protocol.EACCAProtocol
+import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
+import java.io.InputStream
 import java.security.*
 import java.security.spec.X509EncodedKeySpec
 import java.util.*
@@ -45,6 +47,10 @@ class RDEDocument(private val bacKey: BACKey) { // TODO add CAN support
     lateinit var dg2 : DG2File
     lateinit var faceImageBytes: ByteArray
     lateinit var dg14 : DG14File
+    lateinit var dg14Bytes: ByteArray // Due to some bug we need to store the bytes of DG14
+    // separately, as for some models of passports, the computed encoded DG14 contents are different
+    // from the actual contents of the file on the passport (when reading), making signature
+    // verification fail.
 
     private lateinit var pcdPublicKey : PublicKey
     private lateinit var pcdPrivateKey : PrivateKey
@@ -198,9 +204,18 @@ class RDEDocument(private val bacKey: BACKey) { // TODO add CAN support
         logger.info("Face image read successfully from DG2")
     }
     private fun readDG14() {
-        dg14 = DG14File(passportService.getInputStream(PassportService.EF_DG14,
-            passportService.maxReadBinaryLength
-        )) // TODO On certain models of identity cards, this breaks. The content this returns is different from the output from an RB call. Maybe we should implement our own way of reading this file that is more robust
+        // dg14 = DG14File(passportService.getInputStream(PassportService.EF_DG14,
+        //    passportService.maxReadBinaryLength
+        // ))
+        //
+        // We can't do it this way, because due to some bug, retrieving the encoded contents
+        // of the file will give back different results (parts of the ASN will be ordered
+        // differently), which will make the signature verification fail.
+        // So we have to do it the hard way, by reading the file manually ourselves
+
+        dg14Bytes = readDGwithRB(14)
+        dg14 = DG14File(ByteArrayInputStream(dg14Bytes))
+
         logger.info("DG14 read successfully")
 
         // after authentication, we might be able to read more data
@@ -240,7 +255,7 @@ class RDEDocument(private val bacKey: BACKey) { // TODO add CAN support
             if (!Arrays.equals(computedHash, dataHashes[2])) throw IllegalStateException("DG2 hash mismatch")
         }
         if (::dg14.isInitialized){
-            val computedHash: ByteArray = digest.digest(dg14.encoded)
+            val computedHash: ByteArray = digest.digest(dg14Bytes) // We can't use dg14.encoded, because on certain models of passports, it will be different from the original file
             if (!Arrays.equals(computedHash, dataHashes[14])) throw IllegalStateException("DG14 hash mismatch")
         }
         logger.info("DG hashes verified successfully")
@@ -253,10 +268,7 @@ class RDEDocument(private val bacKey: BACKey) { // TODO add CAN support
                 initVerify(efSOD.docSigningCertificate)
                 update(efSOD.eContent)
             }
-        logger.info("efSOD.docSigningCertificate.encoded: ${Hex.toHexString(efSOD.docSigningCertificate.encoded)}")
-        logger.info("efSOD.eContent: ${Hex.toHexString(efSOD.eContent)}")
         val verified = s.verify(efSOD.encryptedDigest)
-        logger.info("efSOD.encryptedDigest: ${Hex.toHexString(efSOD.encryptedDigest)}")
         if (!verified) throw IllegalStateException("SOD hash verification failed")
         logger.info("SOD hash verified successfully")
         return verified
@@ -277,13 +289,9 @@ class RDEDocument(private val bacKey: BACKey) { // TODO add CAN support
         return rbResponseData
     }
 
-    fun dgIdToDG(dgId: Int): DataGroup {
-        return when (dgId) {
-            1 -> dg1
-            2 -> dg2
-            14 -> dg14
-            else -> throw IllegalArgumentException("Unsupported DG ID $dgId")
-        }
+    private fun readDGwithRB(dgId: Int): ByteArray {
+        val stream = passportService.getInputStream(dgIDToEFDGID(dgId), passportService.maxReadBinaryLength)
+        return readAllBytes(stream)!!
     }
 
     fun enroll(documentName : String, rdeDGId : Int, rdeRBLength : Int, withSecurityData: Boolean = true, withMRZData: Boolean = true, withFaceImage: Boolean = false) : RDEEnrollmentParameters {
@@ -301,18 +309,26 @@ class RDEDocument(private val bacKey: BACKey) { // TODO add CAN support
             readDG2()
         }
 
-        doPassiveAuth() // TODO it is questionable whether this is needed for RDE enrollment. If we want to enrollment withSecurityData, the keyserver and end user should do this anyway, so we could just skip it here
+        try {
+            if (withSecurityData) {
+                doPassiveAuth()
+            }
+        } catch (e: Exception) {
+            logger.warning("Passive authentication failed: ${e.message}")
+        }
 
         doCA(caInfo!!, caPublicKeyInfo!!)
 
-        val caOid = caInfo!!.objectIdentifier
+        // TODO technically, we don't need to do CA at all, but let's do it anyway for now so we are certain that CA is supported and our DG contents dont change after CA (which might be the case for certain data groups)
+
         val rbResponse = doRBCall(rdeDGId, rdeRBLength)
         val rdeDGContent = if (withSecurityData) { // If we include security data, we include the entire DG, because otherwise the dg hashes won't verify. Otherwise we just include the RB response that is shorter, because we don't need the full DG for simple RDE
-            Hex.toHexString(dgIdToDG(rdeDGId).encoded) // TODO on certain models of passports, the encoded DG content is not the same as the RB response. Also, we might not have read the DG yet, so we might need to do that here.
+            Hex.toHexString(readDGwithRB(rdeDGId))
         } else {
             Hex.toHexString(rbResponse)
         }
 
+        val caOid = caInfo!!.objectIdentifier
         val piccPublicKeyData = Hex.toHexString(caPublicKeyInfo!!.subjectPublicKey.encoded)
         val securityData = if (withSecurityData) Hex.toHexString(efSOD.encoded).replace("\n", "") else null
         val mrzData = if (withMRZData) Hex.toHexString(dg1.encoded).replace("\n", "") else null
@@ -452,6 +468,42 @@ class RDEDocument(private val bacKey: BACKey) { // TODO add CAN support
             val agreementAlg = agreementAlgFromCAOID(oid)
             val keyFactory = KeyFactory.getInstance(agreementAlg, BouncyCastleProvider())
             return keyFactory.generatePublic(X509EncodedKeySpec(keyBytes))
+        }
+
+        private fun readAllBytes(inputStream: InputStream): ByteArray? {
+            val buffer = ByteArray(4096) // TODO this should be a lot bigger (check ICAO spec)
+            ByteArrayOutputStream(4096).use { result ->
+                var bytesRead: Int
+                while (inputStream.read(buffer).also { bytesRead = it } != -1) {
+                    result.write(buffer, 0, bytesRead)
+                }
+                result.flush()
+                return result.toByteArray()
+            }
+        }
+
+        fun dgIDToEFDGID(dgId: Int) : Short {
+            return when (dgId) {
+                1 -> PassportService.EF_DG1;
+                2 -> PassportService.EF_DG2;
+                3 -> PassportService.EF_DG3;
+                4 -> PassportService.EF_DG4;
+                5 -> PassportService.EF_DG5;
+                6 -> PassportService.EF_DG6;
+                7 -> PassportService.EF_DG7;
+                8 -> PassportService.EF_DG8;
+                9 -> PassportService.EF_DG9;
+                10 -> PassportService.EF_DG10;
+                11 -> PassportService.EF_DG11;
+                12 -> PassportService.EF_DG12;
+                13 -> PassportService.EF_DG13;
+                14 -> PassportService.EF_DG14;
+                15 -> PassportService.EF_DG15;
+                16 -> PassportService.EF_DG16;
+                else -> {
+                    throw IllegalArgumentException("Unknown DG ID: $dgId")
+                }
+            }
         }
     }
 }

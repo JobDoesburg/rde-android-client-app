@@ -48,7 +48,7 @@ class RDEKeyGenerator(var enrollmentParams: RDEEnrollmentParameters) {
     private fun deriveEncryptionKey(sharedSecret : ByteArray) : ByteArray {
         val ksEnc = Util.deriveKey(sharedSecret, cipherAlg, keyLength, Util.ENC_MODE)
         val ksMac = Util.deriveKey(sharedSecret, cipherAlg, keyLength, Util.MAC_MODE)
-        val emulatedResponse = AESAPDUEncoder(ksEnc.encoded, ksMac.encoded).write(Hex.hexStringToBytes(enrollmentParams.rdeDGContent))
+        val emulatedResponse = AESAPDUEncoder(ksEnc.encoded, ksMac.encoded).write(Hex.hexStringToBytes(enrollmentParams.rdeDGContent)) // TODO dont use our own AESAPDUEncoder, use the one from jmrtd
         return RDEDocument.getDecryptionKeyFromAPDUResponse(emulatedResponse)
     }
 
