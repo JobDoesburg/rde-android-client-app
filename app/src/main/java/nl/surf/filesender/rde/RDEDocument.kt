@@ -45,7 +45,6 @@ class RDEDocument(private val bacKey: BACKey) { // TODO add CAN support
     lateinit var efSOD : SODFile
     lateinit var dg1 : DG1File
     lateinit var dg2 : DG2File
-    lateinit var faceImageBytes: ByteArray
     lateinit var dg14 : DG14File
     lateinit var dg14Bytes: ByteArray // Due to some bug we need to store the bytes of DG14
     // separately, as for some models of passports, the computed encoded DG14 contents are different
@@ -194,15 +193,8 @@ class RDEDocument(private val bacKey: BACKey) { // TODO add CAN support
             passportService.maxReadBinaryLength
         ))
         logger.info("DG2 read successfully")
+    }
 
-//        getFaceImage() // TODO is this required? What is the difference with just reading dg2
-    }
-    private fun getFaceImage() {
-        val outputStream = ByteArrayOutputStream()
-        dg2.faceInfos[0].writeObject((outputStream))
-        faceImageBytes = outputStream.toByteArray()
-        logger.info("Face image read successfully from DG2")
-    }
     private fun readDG14() {
         // dg14 = DG14File(passportService.getInputStream(PassportService.EF_DG14,
         //    passportService.maxReadBinaryLength
@@ -332,7 +324,6 @@ class RDEDocument(private val bacKey: BACKey) { // TODO add CAN support
         val piccPublicKeyData = Hex.toHexString(caPublicKeyInfo!!.subjectPublicKey.encoded)
         val securityData = if (withSecurityData) Hex.toHexString(efSOD.encoded).replace("\n", "") else null
         val mrzData = if (withMRZData) Hex.toHexString(dg1.encoded).replace("\n", "") else null
-//        val faceImageData = if (withFaceImage) Hex.toHexString(faceImageBytes).replace("\n", "") else null
         val faceImageData = if (withFaceImage) Hex.toHexString(dg2.encoded).replace("\n", "") else null
 
 
