@@ -26,7 +26,7 @@ class EnrollmentOptionsActivity : AppCompatActivity() {
         withFaceImageDataCheckBox = findViewById(R.id.withFaceImageDataCheckBox)
 
         withMRZDataCheckBox.setOnClickListener { onMRZCheckBoxClick() }
-        withFaceImageDataCheckBox.setOnClickListener { onMRZCheckBoxClick() }
+        withFaceImageDataCheckBox.setOnClickListener { onFaceImageCheckBoxClick() }
 
         val nextButton = findViewById<Button>(R.id.nextButton)
         nextButton.setOnClickListener {
