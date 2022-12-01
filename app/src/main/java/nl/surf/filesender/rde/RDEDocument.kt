@@ -200,7 +200,7 @@ class RDEDocument(private val bacKey: BACKey) { // TODO add CAN support
     private fun readDG14() {
         dg14 = DG14File(passportService.getInputStream(PassportService.EF_DG14,
             passportService.maxReadBinaryLength
-        ))
+        )) // TODO On certain models of identity cards, this breaks. The content this returns is different from the output from an RB call. Maybe we should implement our own way of reading this file that is more robust
         logger.info("DG14 read successfully")
 
         // after authentication, we might be able to read more data
@@ -301,17 +301,17 @@ class RDEDocument(private val bacKey: BACKey) { // TODO add CAN support
             readDG2()
         }
 
-        try {
-            doPassiveAuth() // TODO it is questionable whether this is needed for RDE enrollment. If we want to enrollment withSecurityData, the keyserver and end user should do this anyway, so we could just skip it here
-        } catch (e: Exception) {
-            logger.warning("Passive authentication failed, continuing anyway: $e") // TODO we should definitely not continue if this fails
-        }
+        doPassiveAuth() // TODO it is questionable whether this is needed for RDE enrollment. If we want to enrollment withSecurityData, the keyserver and end user should do this anyway, so we could just skip it here
 
         doCA(caInfo!!, caPublicKeyInfo!!)
 
         val caOid = caInfo!!.objectIdentifier
         val rbResponse = doRBCall(rdeDGId, rdeRBLength)
-        val rdeDGContent = if (withSecurityData) Hex.toHexString(dgIdToDG(rdeDGId).encoded) else Hex.toHexString(rbResponse) // If we include security data, we include the entire DG, because otherwise the dg hashes won't verify. Otherwise we just include the RB response that is shorter, because we don't need the full DG for simple RDE
+        val rdeDGContent = if (withSecurityData) { // If we include security data, we include the entire DG, because otherwise the dg hashes won't verify. Otherwise we just include the RB response that is shorter, because we don't need the full DG for simple RDE
+            Hex.toHexString(dgIdToDG(rdeDGId).encoded) // TODO on certain models of passports, the encoded DG content is not the same as the RB response. Also, we might not have read the DG yet, so we might need to do that here.
+        } else {
+            Hex.toHexString(rbResponse)
+        }
 
         val piccPublicKeyData = Hex.toHexString(caPublicKeyInfo!!.subjectPublicKey.encoded)
         val securityData = if (withSecurityData) Hex.toHexString(efSOD.encoded).replace("\n", "") else null
