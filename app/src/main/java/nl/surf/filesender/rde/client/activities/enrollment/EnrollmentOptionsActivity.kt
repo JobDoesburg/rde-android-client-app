@@ -25,9 +25,30 @@ class EnrollmentOptionsActivity : AppCompatActivity() {
         withMRZDataCheckBox = findViewById(R.id.withMRZDataCheckBox)
         withFaceImageDataCheckBox = findViewById(R.id.withFaceImageDataCheckBox)
 
+        withMRZDataCheckBox.setOnClickListener { onMRZCheckBoxClick() }
+        withFaceImageDataCheckBox.setOnClickListener { onMRZCheckBoxClick() }
+
         val nextButton = findViewById<Button>(R.id.nextButton)
         nextButton.setOnClickListener {
             onNextButtonClick()
+        }
+    }
+
+    private fun onMRZCheckBoxClick() {
+        if (withMRZDataCheckBox.isChecked) {
+            withSecurityDataCheckBox.isChecked = true
+            withSecurityDataCheckBox.isEnabled = false
+        } else {
+            withSecurityDataCheckBox.isEnabled = true
+        }
+    }
+
+    private fun onFaceImageCheckBoxClick() {
+        if (withFaceImageDataCheckBox.isChecked) {
+            withSecurityDataCheckBox.isChecked = true
+            withSecurityDataCheckBox.isEnabled = false
+        } else {
+            withSecurityDataCheckBox.isEnabled = true
         }
     }
 
