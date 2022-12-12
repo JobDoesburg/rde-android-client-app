@@ -23,6 +23,8 @@ open class ScanQRActivity : AppCompatActivity() {
         setContentView(R.layout.activity_scan_qr)
         codeScannerView = findViewById(R.id.scanner_view)
 
+        // TODO: check if camera permission is granted, if not, ask for it
+
         startQRScanner()
     }
 

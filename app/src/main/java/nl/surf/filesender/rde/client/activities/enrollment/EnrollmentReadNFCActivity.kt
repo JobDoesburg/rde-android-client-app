@@ -18,6 +18,7 @@ class EnrollmentReadNFCActivity : ReadNFCActivity() {
     private var withSecurityData = false
     private var withMRZData = false
     private var withFaceImageData = false
+    private var disableWhenPersonalNumberFound = false
 
     companion object {
         const val RDE_DG_ID = 14
@@ -38,7 +39,7 @@ class EnrollmentReadNFCActivity : ReadNFCActivity() {
         super.onNewIntent(intent)
 
         try {
-            enroll(documentName, withSecurityData, withMRZData, withFaceImageData)
+            enroll(documentName, withSecurityData, withMRZData, withFaceImageData, disableWhenPersonalNumberFound)
             Toast.makeText(this, "Done", Toast.LENGTH_LONG).show()
             Log.d("EnrollmentReadNFC", "Enrollment done")
         } catch (e: Exception) {
@@ -49,7 +50,7 @@ class EnrollmentReadNFCActivity : ReadNFCActivity() {
         }
     }
 
-    private fun enroll(documentName: String, withSecurityData: Boolean = true, withMRZData: Boolean = true, withFaceImage: Boolean = true){
+    private fun enroll(documentName: String, withSecurityData: Boolean = true, withMRZData: Boolean = true, withFaceImage: Boolean = true, disableWhenPersonalNumberFound: Boolean = true) {
         val document = RDEDocument(bacKey!!)
 
         val isoDep = IsoDep.get(tag)
@@ -70,13 +71,14 @@ class EnrollmentReadNFCActivity : ReadNFCActivity() {
 
         val enrollmentParams = document.enroll(enrollmentDocumentName, RDE_DG_ID, RDE_RB_LENGTH, withSecurityData, withMRZData, withFaceImage)
 
-        if (withMRZData && enrollmentParams.mrzData != null && document.dg1.mrzInfo.personalNumber != null) {
+        if (disableWhenPersonalNumberFound && withMRZData && enrollmentParams.mrzData != null && document.dg1.mrzInfo.personalNumber != null) {
             // The MRZ data contains a privacy sensitive field that we may not process, so we remove the MRZ data
             Toast.makeText(this, "MRZ data contains personal number, cannot include MRZ data", Toast.LENGTH_LONG).show()
             setResult(Activity.RESULT_CANCELED)
             finish()
             return
         }
+        // TODO the user should verify the data before continuing
 
         document.close()
 

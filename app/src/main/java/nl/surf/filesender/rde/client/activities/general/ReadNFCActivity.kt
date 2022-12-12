@@ -61,7 +61,7 @@ open class ReadNFCActivity : AppCompatActivity() {
         val intent = Intent(this, this.javaClass)
         intent.flags = Intent.FLAG_ACTIVITY_SINGLE_TOP
         val pendingIntent =
-            PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+            PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_MUTABLE)
         NfcAdapter.getDefaultAdapter(this).enableForegroundDispatch(
             this,
             pendingIntent,
@@ -70,7 +70,7 @@ open class ReadNFCActivity : AppCompatActivity() {
         )
     }
 
-    private fun fixSecurityProviders() {
+    fun fixSecurityProviders() {
         Security.removeProvider("BC")
         Security.insertProviderAt(BouncyCastleProvider(), 0)
     }

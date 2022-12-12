@@ -96,7 +96,7 @@ class RDEDocument(private val bacKey: BACKey) { // TODO add CAN support
         try {
             passportService.getInputStream(
                 PassportService.EF_CARD_ACCESS,
-                passportService.maxReadBinaryLength
+                passportService.maxTranceiveLength
             ).use { inputStream ->
                 cardAccessFile = CardAccessFile(inputStream)
                 logger.info("EF.CardAccess read successfully")

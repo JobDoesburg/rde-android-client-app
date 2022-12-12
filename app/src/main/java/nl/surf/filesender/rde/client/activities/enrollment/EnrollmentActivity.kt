@@ -10,13 +10,11 @@ import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.coroutines.runBlocking
-import nl.surf.filesender.rde.client.activities.MainActivity
-import nl.surf.filesender.rde.client.activities.decryption.DecryptionActivity
-import nl.surf.filesender.rde.client.activities.general.ScanQRActivity
 import nl.surf.filesender.rde.client.RDEDocumentMRZData
+import nl.surf.filesender.rde.client.activities.MainActivity
 import nl.surf.filesender.rde.client.activities.general.ReadMRZActivity
+import nl.surf.filesender.rde.client.activities.general.ScanQRActivity
 import nl.surf.filesender.rde.data.RDEEnrollmentParameters
-import kotlin.properties.Delegates
 
 class EnrollmentActivity : AppCompatActivity() {
     private val client = HttpClient(OkHttp) { // We need to use OkHttp because of DNS + IPv6 issues with CIO engine
@@ -32,8 +30,6 @@ class EnrollmentActivity : AppCompatActivity() {
     private var withSecurityData = false
     private var withMRZData = false
     private var withFaceImageData = false
-
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
