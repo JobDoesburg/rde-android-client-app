@@ -102,7 +102,7 @@ class DecryptionActivity : AppCompatActivity() {
             if (resultCode == RESULT_OK) {
                 retrievedKey = data?.getByteArrayExtra("result")!!
                 Log.d("DecryptionActivity", "Received key: $retrievedKey")
-                sendRetrievedKey()
+                sendRetrievedKey() // TODO if this fails, print the error message as a toast
             } else if (resultCode == RESULT_CANCELED) {
                 launchMRZInput()
             }

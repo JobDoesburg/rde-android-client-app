@@ -103,7 +103,7 @@ class EnrollmentActivity : AppCompatActivity() {
         if (requestCode == LAUNCH_READ_NFC) {
             if (resultCode == RESULT_OK) {
                 enrollmentParams = data?.extras!!["result"] as RDEEnrollmentParameters
-                performEnrollment()
+                performEnrollment() // TODO if this fails, print the error message as a toast
             } else if (resultCode == RESULT_CANCELED) {
                 launchMRZInput()
             }
