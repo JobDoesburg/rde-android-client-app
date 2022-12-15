@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="nl.surf.filesender.rde.client">
+    package="nl.surf.rde.app">
 
     <uses-permission android:name="android.permission.NFC" />
     <uses-permission android:name="android.permission.CAMERA" />
@@ -22,10 +22,10 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.SURFfilesenderRDEclientAndroid"
+        android:theme="@style/Theme.SURFRDEClient"
         tools:targetApi="31">
         <activity
-            android:name=".activities.MainActivity"
+            android:name="MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -34,28 +34,28 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activities.enrollment.EnrollmentActivity"
+            android:name=".enrollment.EnrollmentActivity"
             android:exported="true" />
         <activity
-            android:name=".activities.decryption.DecryptionActivity"
+            android:name=".decryption.DecryptionActivity"
             android:exported="true" />
         <activity
-            android:name=".activities.general.ScanQRActivity"
+            android:name=".common.ScanQRActivity"
             android:exported="false" />
         <activity
-            android:name=".activities.general.ReadNFCActivity"
+            android:name=".common.ReadNFCActivity"
             android:exported="false" />
         <activity
-            android:name=".activities.general.ReadMRZActivity"
+            android:name=".common.ReadMRZActivity"
             android:exported="false" />
         <activity
-            android:name=".activities.enrollment.EnrollmentOptionsActivity"
+            android:name=".enrollment.EnrollmentOptionsActivity"
             android:exported="false" />
         <activity
-            android:name=".activities.enrollment.EnrollmentReadNFCActivity"
+            android:name=".enrollment.EnrollmentReadNFCActivity"
             android:exported="false" />
         <activity
-            android:name=".activities.decryption.DecryptionReadNFCActivity"
+            android:name=".decryption.DecryptionReadNFCActivity"
             android:exported="false" />
     </application>
 

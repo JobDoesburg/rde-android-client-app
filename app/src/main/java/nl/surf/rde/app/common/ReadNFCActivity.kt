@@ -1,21 +1,19 @@
-package nl.surf.filesender.rde.client.activities.general
+package nl.surf.rde.app.common
 
 import android.app.PendingIntent
 import android.content.Intent
 import android.nfc.NfcAdapter
 import android.nfc.Tag
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import nl.surf.filesender.rde.client.R
-import nl.surf.filesender.rde.client.RDEDocumentMRZData
+import nl.surf.rde.app.R
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.jmrtd.BACKey
 import java.security.Security
 
 open class ReadNFCActivity : AppCompatActivity() {
-    var nfcAdapter: NfcAdapter? = null
+    private var nfcAdapter: NfcAdapter? = null
     var bacKey: BACKey? = null
 
     var tag: Tag? = null
@@ -37,7 +35,7 @@ open class ReadNFCActivity : AppCompatActivity() {
             Toast.makeText(this, "NFC not supported", Toast.LENGTH_LONG).show()
             finish()
         }
-        val mrzData = intent.extras!!["mrzData"] as RDEDocumentMRZData
+        val mrzData = intent.extras!!["mrzData"] as DocumentMRZData
         mrzData.toBACKey()
         bacKey = mrzData.toBACKey()
     }
@@ -72,7 +70,7 @@ open class ReadNFCActivity : AppCompatActivity() {
         )
     }
 
-    fun fixSecurityProviders() {
+    private fun fixSecurityProviders() {
         Security.removeProvider("BC")
         Security.insertProviderAt(BouncyCastleProvider(), 0)
     }

@@ -13,5 +13,6 @@ dependencyResolutionManagement {
         maven { url 'https://jitpack.io' }
     }
 }
-rootProject.name = "SURFfilesender RDE-client android"
+rootProject.name = "SURF RDE client"
 include ':app'
+include ':RDE-Java-client'

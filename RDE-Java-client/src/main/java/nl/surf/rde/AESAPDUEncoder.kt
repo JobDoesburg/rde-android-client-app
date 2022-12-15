@@ -1,6 +1,5 @@
-package nl.surf.filesender.rde
+package nl.surf.rde
 
-import net.sf.scuba.util.Hex
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.jmrtd.Util
 import java.io.ByteArrayOutputStream
@@ -39,7 +38,7 @@ class AESAPDUEncoder //PassportCrypto
         IOException::class
     )
     fun write(response: ByteArray): ByteArray {
-        require(response.size != 0) { "Response cannot be zero length" }
+        require(response.isNotEmpty()) { "Response cannot be zero length" }
         writeDo87(response)
         writeDo99()
         writeMac()
@@ -75,7 +74,7 @@ class AESAPDUEncoder //PassportCrypto
         IOException::class
     )
     private fun getEncodedData(response: ByteArray): ByteArray {
-        if (response.size == 0) return response
+        if (response.isEmpty()) return response
         val paddedResponse = getAlignedPlainText(response)
         return cipher.doFinal(paddedResponse)
     }
@@ -85,7 +84,7 @@ class AESAPDUEncoder //PassportCrypto
         return if (paddedLength == buffer.size) buffer else Util.pad(buffer, paddedLength)
     }
 
-    fun getPaddedLength(bufferSize: Int): Int {
+    private fun getPaddedLength(bufferSize: Int): Int {
         return (bufferSize + BLOCK_SIZE) / BLOCK_SIZE * BLOCK_SIZE
     }
 
@@ -147,7 +146,6 @@ class AESAPDUEncoder //PassportCrypto
         val provider = BouncyCastleProvider()
         cipher = Cipher.getInstance(DO87_CIPHER, provider)
         val iv = getIv(ksEnc, provider)
-        println("IV: " + Hex.toHexString(iv))
         cipher.init(
             Cipher.ENCRYPT_MODE,
             SecretKeySpec(ksEnc, AES_KEY_SPEC_NAME),

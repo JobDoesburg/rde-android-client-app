@@ -1,4 +1,4 @@
-package nl.surf.filesender.rde.data
+package nl.surf.rde.data
 
 import java.io.Serializable
 

@@ -1,4 +1,4 @@
-package nl.surf.filesender.rde.client.activities.enrollment
+package nl.surf.rde.app.enrollment
 
 import android.app.Activity
 import android.content.Intent
@@ -6,12 +6,10 @@ import android.nfc.tech.IsoDep
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 import net.sf.scuba.smartcards.CardService
-import nl.surf.filesender.rde.client.R
-import nl.surf.filesender.rde.RDEDocument
-import nl.surf.filesender.rde.client.activities.general.ReadNFCActivity
+import nl.surf.rde.RDEDocument
+import nl.surf.rde.app.R
+import nl.surf.rde.app.common.ReadNFCActivity
 
 class EnrollmentReadNFCActivity : ReadNFCActivity() {
     private lateinit var documentName: String
@@ -87,7 +85,7 @@ class EnrollmentReadNFCActivity : ReadNFCActivity() {
             returnIntent.putExtras(receivedIntentExtras!!)
         }
         returnIntent.putExtra("result", enrollmentParams)
-        setResult(Activity.RESULT_OK, returnIntent);
-        finish();
+        setResult(Activity.RESULT_OK, returnIntent)
+        finish()
     }
 }

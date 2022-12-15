@@ -1,4 +1,4 @@
-package nl.surf.filesender.rde.client.activities.decryption
+package nl.surf.rde.app.decryption
 
 import android.app.Activity
 import android.content.Intent
@@ -7,14 +7,13 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import net.sf.scuba.smartcards.CardService
-import net.sf.scuba.util.Hex
-import nl.surf.filesender.rde.data.RDEDecryptionParameters
-import nl.surf.filesender.rde.RDEDocument
-import nl.surf.filesender.rde.client.activities.general.ReadNFCActivity
+import nl.surf.rde.RDEDocument
+import nl.surf.rde.app.common.ReadNFCActivity
+import nl.surf.rde.data.RDEDecryptionParameters
 
 class DecryptionReadNFCActivity : ReadNFCActivity() {
 
-    lateinit var decryptionParameters: RDEDecryptionParameters
+    private lateinit var decryptionParameters: RDEDecryptionParameters
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,14 +41,14 @@ class DecryptionReadNFCActivity : ReadNFCActivity() {
 
             val returnIntent = Intent()
             returnIntent.putExtra("result", retrievedKey)
-            setResult(Activity.RESULT_OK, returnIntent);
-            finish();
+            setResult(Activity.RESULT_OK, returnIntent)
+            finish()
         } catch (e: Exception) {
             Log.e("RDE", "Error while decrypting", e)
             Toast.makeText(this, "Error while decrypting: ${e.message}", Toast.LENGTH_LONG).show()
             val returnIntent = Intent()
-            setResult(Activity.RESULT_CANCELED, returnIntent);
-            finish();
+            setResult(Activity.RESULT_CANCELED, returnIntent)
+            finish()
         }
     }
 

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">SURFfilesender RDE-client</string>
+    <string name="app_name">SURF RDE client</string>
     <string name="next_button_text">Next</string>
     <string name="enroll_button_text">Enroll</string>
     <string name="decrypt_button_text">Decrypt</string>

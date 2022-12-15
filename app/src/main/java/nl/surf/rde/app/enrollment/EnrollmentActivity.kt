@@ -1,4 +1,4 @@
-package nl.surf.filesender.rde.client.activities.enrollment
+package nl.surf.rde.app.enrollment
 
 import android.content.Intent
 import android.os.Bundle
@@ -10,11 +10,11 @@ import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import kotlinx.coroutines.runBlocking
-import nl.surf.filesender.rde.client.RDEDocumentMRZData
-import nl.surf.filesender.rde.client.activities.MainActivity
-import nl.surf.filesender.rde.client.activities.general.ReadMRZActivity
-import nl.surf.filesender.rde.client.activities.general.ScanQRActivity
-import nl.surf.filesender.rde.data.RDEEnrollmentParameters
+import nl.surf.rde.app.common.DocumentMRZData
+import nl.surf.rde.app.MainActivity
+import nl.surf.rde.app.common.ReadMRZActivity
+import nl.surf.rde.app.common.ScanQRActivity
+import nl.surf.rde.data.RDEEnrollmentParameters
 
 class EnrollmentActivity : AppCompatActivity() {
     private val client = HttpClient(OkHttp) { // We need to use OkHttp because of DNS + IPv6 issues with CIO engine
@@ -24,7 +24,7 @@ class EnrollmentActivity : AppCompatActivity() {
     }
 
     private lateinit var socketUrl : String
-    private lateinit var mrzData: RDEDocumentMRZData
+    private lateinit var mrzData: DocumentMRZData
     private lateinit var enrollmentParams: RDEEnrollmentParameters
     private lateinit var documentName: String
     private var withSecurityData = false
@@ -36,7 +36,7 @@ class EnrollmentActivity : AppCompatActivity() {
         launchQRScanner()
     }
 
-    fun launchQRScanner() {
+    private fun launchQRScanner() {
         val intent = Intent(this, ScanQRActivity::class.java)
         startActivityForResult(intent, LAUNCH_QR_SCANNER)
     }
@@ -83,7 +83,7 @@ class EnrollmentActivity : AppCompatActivity() {
         }
         if (requestCode == LAUNCH_MRZ_INPUT) {
             if (resultCode == RESULT_OK) {
-                mrzData = data?.extras!!["result"] as RDEDocumentMRZData
+                mrzData = data?.extras!!["result"] as DocumentMRZData
                 launchEnrollmentOptionsInput()
             } else if (resultCode == RESULT_CANCELED) {
                 launchQRScanner()

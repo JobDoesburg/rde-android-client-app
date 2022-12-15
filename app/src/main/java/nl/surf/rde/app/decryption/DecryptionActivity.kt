@@ -1,4 +1,4 @@
-package nl.surf.filesender.rde.client.activities.decryption
+package nl.surf.rde.app.decryption
 
 import android.content.Intent
 import android.os.Bundle
@@ -13,12 +13,12 @@ import io.ktor.websocket.*
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
-import nl.surf.filesender.rde.client.activities.MainActivity
-import nl.surf.filesender.rde.client.activities.general.ScanQRActivity
-import nl.surf.filesender.rde.client.handshake.DecryptionHandshakeProtocol
-import nl.surf.filesender.rde.data.RDEDecryptionParameters
-import nl.surf.filesender.rde.client.RDEDocumentMRZData
-import nl.surf.filesender.rde.client.activities.general.ReadMRZActivity
+import nl.surf.rde.app.MainActivity
+import nl.surf.rde.app.common.ScanQRActivity
+import nl.surf.rde.app.decryption.handshake.DecryptionHandshakeProtocol
+import nl.surf.rde.app.common.DocumentMRZData
+import nl.surf.rde.app.common.ReadMRZActivity
+import nl.surf.rde.data.RDEDecryptionParameters
 
 
 class DecryptionActivity : AppCompatActivity() {
@@ -33,7 +33,7 @@ class DecryptionActivity : AppCompatActivity() {
     private lateinit var socketUrl : String
     private lateinit var handshake : DecryptionHandshakeProtocol
     private lateinit var decryptionParams: RDEDecryptionParameters
-    private lateinit var mrzData: RDEDocumentMRZData
+    private lateinit var mrzData: DocumentMRZData
     private lateinit var retrievedKey: ByteArray
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -41,7 +41,7 @@ class DecryptionActivity : AppCompatActivity() {
         launchQRScanner()
     }
 
-    fun launchQRScanner() {
+    private fun launchQRScanner() {
         val intent = Intent(this, ScanQRActivity::class.java)
         startActivityForResult(intent, LAUNCH_QR_SCANNER)
     }
@@ -91,7 +91,7 @@ class DecryptionActivity : AppCompatActivity() {
         }
         if (requestCode == LAUNCH_MRZ_INPUT) {
             if (resultCode == RESULT_OK) {
-                mrzData = data?.extras!!["result"] as RDEDocumentMRZData
+                mrzData = data?.extras!!["result"] as DocumentMRZData
                 Log.d("DecryptionActivity", "Received MRZ data: $mrzData")
                 launchReadNFC()
             } else if (resultCode == RESULT_CANCELED) {

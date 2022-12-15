@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activities.enrollment.EnrollmentOptionsActivity">
+    tools:context=".enrollment.EnrollmentOptionsActivity">
 
     <LinearLayout
         android:id="@+id/enrollmentDataFormLayout"
@@ -39,6 +39,7 @@
             android:inputType="textAutoCorrect"
             android:minHeight="48dp"
             android:singleLine="true"
+            android:text="Paspoort"
             android:textColorHint="#757575" />
 
         <CheckBox

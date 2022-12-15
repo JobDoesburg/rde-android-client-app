@@ -1,4 +1,4 @@
-package nl.surf.filesender.rde.client.activities.enrollment
+package nl.surf.rde.app.enrollment
 
 import android.app.Activity
 import android.content.Intent
@@ -8,7 +8,7 @@ import android.widget.Button
 import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.Toast
-import nl.surf.filesender.rde.client.R
+import nl.surf.rde.app.R
 
 class EnrollmentOptionsActivity : AppCompatActivity() {
     private lateinit var documentNameField: EditText
@@ -39,7 +39,7 @@ class EnrollmentOptionsActivity : AppCompatActivity() {
             withSecurityDataCheckBox.isChecked = true
             withSecurityDataCheckBox.isEnabled = false
         } else {
-            withSecurityDataCheckBox.isEnabled = true
+            withSecurityDataCheckBox.isEnabled = !withMRZDataCheckBox.isChecked && !withFaceImageDataCheckBox.isChecked
         }
     }
 
@@ -48,7 +48,7 @@ class EnrollmentOptionsActivity : AppCompatActivity() {
             withSecurityDataCheckBox.isChecked = true
             withSecurityDataCheckBox.isEnabled = false
         } else {
-            withSecurityDataCheckBox.isEnabled = true
+            withSecurityDataCheckBox.isEnabled = !withMRZDataCheckBox.isChecked && !withFaceImageDataCheckBox.isChecked
         }
     }
 
@@ -64,11 +64,11 @@ class EnrollmentOptionsActivity : AppCompatActivity() {
         }
 
         val resultIntent = Intent()
-        resultIntent.putExtra("documentName", documentName);
-        resultIntent.putExtra("withSecurityData", withSecurityData);
-        resultIntent.putExtra("withMRZData", withMRZData);
-        resultIntent.putExtra("withFaceImageData", withFaceImageData);
-        setResult(Activity.RESULT_OK, resultIntent);
-        finish();
+        resultIntent.putExtra("documentName", documentName)
+        resultIntent.putExtra("withSecurityData", withSecurityData)
+        resultIntent.putExtra("withMRZData", withMRZData)
+        resultIntent.putExtra("withFaceImageData", withFaceImageData)
+        setResult(Activity.RESULT_OK, resultIntent)
+        finish()
     }
 }

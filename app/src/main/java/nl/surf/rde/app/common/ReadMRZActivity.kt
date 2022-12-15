@@ -1,6 +1,5 @@
-package nl.surf.filesender.rde.client.activities.general
+package nl.surf.rde.app.common
 
-import android.app.Activity
 import android.app.DatePickerDialog
 import android.content.Intent
 import android.os.Bundle
@@ -8,8 +7,7 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import nl.surf.filesender.rde.client.R
-import nl.surf.filesender.rde.client.RDEDocumentMRZData
+import nl.surf.rde.app.R
 import java.util.*
 
 open class ReadMRZActivity : AppCompatActivity() {
@@ -46,7 +44,7 @@ open class ReadMRZActivity : AppCompatActivity() {
                 this,
                 { _, year, month, day ->
                     val value = year.toString().takeLast(2) + (month + 1).toString()
-                        .padStart(2, '0') + day.toString().padStart(2, '0');
+                        .padStart(2, '0') + day.toString().padStart(2, '0')
                     field.setText(value)
                 },
                 y,
@@ -57,7 +55,7 @@ open class ReadMRZActivity : AppCompatActivity() {
         }
     }
 
-    open fun validateMRZData(): RDEDocumentMRZData? {
+    open fun validateMRZData(): DocumentMRZData? {
         val documentId = documentIdField.text.toString()
         val dateOfBirth = dateOfBirthField.text.toString()
         val dateOfExpiry = dateOfExpiryField.text.toString()
@@ -75,7 +73,11 @@ open class ReadMRZActivity : AppCompatActivity() {
             return null
         }
 
-        return RDEDocumentMRZData(documentId = documentId, dateOfBirth = dateOfBirth, dateOfExpiry = dateOfExpiry)
+        return DocumentMRZData(
+            documentId = documentId,
+            dateOfBirth = dateOfBirth,
+            dateOfExpiry = dateOfExpiry
+        )
     }
 
 
@@ -87,9 +89,8 @@ open class ReadMRZActivity : AppCompatActivity() {
         }
 
         val resultIntent = Intent()
-        resultIntent.putExtra("result", mrzData);
-        setResult(Activity.RESULT_OK, resultIntent);
-        finish();
+        resultIntent.putExtra("result", mrzData)
+        setResult(RESULT_OK, resultIntent)
+        finish()
     }
-
 }

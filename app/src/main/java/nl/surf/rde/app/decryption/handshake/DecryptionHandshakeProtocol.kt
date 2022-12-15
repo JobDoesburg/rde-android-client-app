@@ -1,4 +1,4 @@
-package nl.surf.filesender.rde.client.handshake
+package nl.surf.rde.app.decryption.handshake
 
 import com.nimbusds.jose.jwk.*
 import io.ktor.websocket.*
@@ -6,7 +6,6 @@ import kotlinx.serialization.*
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonElement
 import net.sf.scuba.util.Hex
-import nl.surf.filesender.rde.RDEDocument
 import java.security.KeyPair
 import java.security.KeyPairGenerator
 import java.security.interfaces.ECPublicKey
@@ -30,10 +29,10 @@ class DecryptionHandshakeProtocol(private val socket: DefaultWebSocketSession) {
 
     }
 
-    lateinit var iv: ByteArray
-    lateinit var sharedSecret: ByteArray
+    private lateinit var iv: ByteArray
+    private lateinit var sharedSecret: ByteArray
     private lateinit var browserKey: ECPublicKey
-    private val logger = Logger.getLogger(RDEDocument::class.java.name)
+    private val logger = Logger.getLogger(DecryptionHandshakeProtocol::class.java.name)
     private lateinit var appKeyPair: KeyPair
 
     fun generateKeyPair () {

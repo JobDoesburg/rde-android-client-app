@@ -1,9 +1,9 @@
-package nl.surf.filesender.rde
+package nl.surf.rde
 
 import net.sf.scuba.smartcards.*
 import net.sf.scuba.util.Hex
-import nl.surf.filesender.rde.data.RDEDecryptionParameters
-import nl.surf.filesender.rde.data.RDEEnrollmentParameters
+import nl.surf.rde.data.RDEDecryptionParameters
+import nl.surf.rde.data.RDEEnrollmentParameters
 import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.jmrtd.BACKey
 import org.jmrtd.PACEKeySpec

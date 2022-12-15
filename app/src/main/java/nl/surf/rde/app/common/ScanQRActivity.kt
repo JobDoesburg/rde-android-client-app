@@ -1,6 +1,5 @@
-package nl.surf.filesender.rde.client.activities.general
+package nl.surf.rde.app.common
 
-import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
@@ -12,7 +11,7 @@ import com.budiyev.android.codescanner.DecodeCallback
 import com.budiyev.android.codescanner.ErrorCallback
 import com.budiyev.android.codescanner.ScanMode
 import com.google.zxing.BarcodeFormat
-import nl.surf.filesender.rde.client.R
+import nl.surf.rde.app.R
 
 open class ScanQRActivity : AppCompatActivity() {
     private lateinit var codeScanner: CodeScanner
@@ -66,9 +65,9 @@ open class ScanQRActivity : AppCompatActivity() {
 
     open fun processQRCodeScan(data: String) {
         val resultIntent = Intent()
-        resultIntent.putExtra("result", data);
-        setResult(Activity.RESULT_OK, resultIntent);
-        finish();
+        resultIntent.putExtra("result", data)
+        setResult(RESULT_OK, resultIntent)
+        finish()
     }
 
 }
