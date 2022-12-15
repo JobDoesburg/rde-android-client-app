@@ -26,6 +26,8 @@ open class ReadNFCActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_read_nfc)
 
+        // TODO add CAN support
+
         receivedIntentExtras = intent.extras
 
         fixSecurityProviders()

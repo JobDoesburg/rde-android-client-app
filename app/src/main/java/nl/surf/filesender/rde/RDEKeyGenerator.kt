@@ -35,17 +35,17 @@ class RDEKeyGenerator(var enrollmentParams: RDEEnrollmentParameters) {
         val pcdPrivateKey = pcdKeyPair.private
         val sharedSecret = EACCAProtocol.computeSharedSecret(agreementAlg, piccPublicKey, pcdPrivateKey)
 
-        val encryptionKey = deriveEncryptionKey(sharedSecret)
+        val secretKey = deriveSecretKey(sharedSecret)
         val protectedCommand = generateProtectedCommand(sharedSecret)
         val decryptionParams = RDEDecryptionParameters(enrollmentParams.documentName, caOID, Hex.toHexString(pcdPublicKey.encoded), Hex.toHexString(protectedCommand))
-        return RDEKey(encryptionKey, decryptionParams)
+        return RDEKey(decryptionParams, secretKey)
     }
 
     /**
-     * Derives the encryption key from the given shared secret.
+     * Derives the secret key from the given shared secret.
      * @param sharedSecret the shared secret
      */
-    private fun deriveEncryptionKey(sharedSecret : ByteArray) : ByteArray {
+    private fun deriveSecretKey(sharedSecret : ByteArray) : ByteArray {
         val ksEnc = Util.deriveKey(sharedSecret, cipherAlg, keyLength, Util.ENC_MODE)
         val ksMac = Util.deriveKey(sharedSecret, cipherAlg, keyLength, Util.MAC_MODE)
         val emulatedResponse = AESAPDUEncoder(ksEnc.encoded, ksMac.encoded).write(Hex.hexStringToBytes(enrollmentParams.rdeDGContent)) // TODO dont use our own AESAPDUEncoder, use the one from jmrtd

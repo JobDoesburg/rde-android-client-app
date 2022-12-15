@@ -17,6 +17,7 @@ open class ReadMRZActivity : AppCompatActivity() {
     private lateinit var dateOfBirthField: EditText
     private lateinit var dateOfExpiryField: EditText
     // TODO: store the most recent MRZ Data for better usability
+    // TODO: add CAN support
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
