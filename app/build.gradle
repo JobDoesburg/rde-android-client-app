@@ -43,5 +43,5 @@ dependencies {
     implementation 'io.ktor:ktor-serialization-kotlinx-json:2.2.1'
     implementation 'com.nimbusds:nimbus-jose-jwt:9.25.6'
     implementation 'com.github.yuriy-budiyev:code-scanner:2.3.2'
-    implementation project(path: ':RDE-Java-client')
+    implementation project(path: ':rde-java-client')
 }
