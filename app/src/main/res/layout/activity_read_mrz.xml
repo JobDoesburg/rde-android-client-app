@@ -41,7 +41,6 @@
             android:selectAllOnFocus="true"
             android:singleLine="true"
             android:textColorHint="#757575"
-            android:text="NXK3P4PR6"
             tools:ignore="DuplicateSpeakableTextCheck" />
 
         <TextView
@@ -63,7 +62,6 @@
             android:inputType="date"
             android:minHeight="48dp"
             android:textColorHint="#757575"
-            android:text="980827"
             tools:ignore="DuplicateSpeakableTextCheck" />
 
         <TextView
@@ -86,7 +84,6 @@
             android:inputType="date"
             android:minHeight="48dp"
             android:textColorHint="#757575"
-            android:text="281219"
             tools:ignore="DuplicateSpeakableTextCheck" />
 
         <Button
