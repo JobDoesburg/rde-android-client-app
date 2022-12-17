@@ -2,6 +2,8 @@ package nl.surf.rde.app.enrollment
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import io.ktor.client.*
 import io.ktor.client.engine.okhttp.*
@@ -103,7 +105,13 @@ class EnrollmentActivity : AppCompatActivity() {
         if (requestCode == LAUNCH_READ_NFC) {
             if (resultCode == RESULT_OK) {
                 enrollmentParams = data?.extras!!["result"] as RDEEnrollmentParameters
-                performEnrollment() // TODO if this fails, print the error message as a toast
+                try {
+                    performEnrollment()
+                } catch (e: Exception) {
+                    Log.e("EnrollmentActivity", "Error while communicating with keyserver", e)
+                    Toast.makeText(this, "Error while communicating with keyserver: $e", Toast.LENGTH_LONG).show()
+                    finish()
+                }
             } else if (resultCode == RESULT_CANCELED) {
                 launchMRZInput()
             }

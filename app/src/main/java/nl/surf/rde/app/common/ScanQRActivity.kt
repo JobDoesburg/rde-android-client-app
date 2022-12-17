@@ -1,9 +1,15 @@
 package nl.surf.rde.app.common
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import com.budiyev.android.codescanner.AutoFocusMode
 import com.budiyev.android.codescanner.CodeScanner
 import com.budiyev.android.codescanner.CodeScannerView
@@ -17,12 +23,32 @@ open class ScanQRActivity : AppCompatActivity() {
     private lateinit var codeScanner: CodeScanner
     private lateinit var codeScannerView: CodeScannerView
 
+    private val requestPermissionLauncher =
+        registerForActivityResult(
+            ActivityResultContracts.RequestPermission()
+        ){ isGranted: Boolean ->
+            if (isGranted) {
+                codeScanner.startPreview()
+            } else {
+                Toast.makeText(this, "Camera permission is required", Toast.LENGTH_LONG).show()
+            }
+        }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_scan_qr)
         codeScannerView = findViewById(R.id.scanner_view)
 
-        // TODO: check if camera permission is granted, if not, ask for it
+        when {
+            ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.CAMERA
+            ) != PackageManager.PERMISSION_GRANTED -> {
+                requestPermissionLauncher.launch(
+                    Manifest.permission.CAMERA
+                )
+            }
+        }
 
         startQRScanner()
     }
