@@ -27,16 +27,13 @@ class DecryptionReadNFCActivity : ReadNFCActivity() {
     }
 
     private fun extractDecryptionKey(decryptionParameters: RDEDecryptionParameters) {
-        val document = RDEDocument(bacKey!!)
-
         val isoDep = IsoDep.get(tag)
-        isoDep.timeout = 100000 // Long because of debugging, remove in production
         val cardService = CardService.getInstance(isoDep)
 
-        document.init(cardService)
+        val document = RDEDocument(bacKey!!, cardService)
+
         try {
-            document.open()
-            val retrievedKey = document.decrypt(decryptionParameters)
+            val retrievedKey = document.retrieveSecretKey(decryptionParameters)
             document.close()
 
             val returnIntent = Intent()

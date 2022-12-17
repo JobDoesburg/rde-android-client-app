@@ -49,10 +49,7 @@ class EnrollmentReadNFCActivity : ReadNFCActivity() {
     }
 
     private fun enroll(documentName: String, withSecurityData: Boolean = true, withMRZData: Boolean = true, withFaceImage: Boolean = true, disableWhenPersonalNumberFound: Boolean = true) {
-        val document = RDEDocument(bacKey!!)
-
         val isoDep = IsoDep.get(tag)
-        isoDep.timeout = 100000 // Long because of debugging, remove in production
         val cardService = CardService.getInstance(isoDep)
 
         val enrollmentDocumentName: String = if (withMRZData) {
@@ -63,8 +60,7 @@ class EnrollmentReadNFCActivity : ReadNFCActivity() {
             "$documentName ($maskedDocumentNumber)"
         }
 
-        document.init(cardService)
-        document.open()
+        val document = RDEDocument(bacKey!!, cardService)
         // TODO detect the document version and country beforehand, only use withMRZData for certain versions
 
         val enrollmentParams = document.enroll(enrollmentDocumentName, RDE_DG_ID, RDE_RB_LENGTH, withSecurityData, withMRZData, withFaceImage)
