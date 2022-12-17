@@ -41,7 +41,6 @@ open class ReadNFCActivity : AppCompatActivity() {
     }
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
-
         if (NfcAdapter.ACTION_TECH_DISCOVERED != intent!!.action) return
 
         tag = intent.extras!!.getParcelable(NfcAdapter.EXTRA_TAG)
@@ -72,6 +71,7 @@ open class ReadNFCActivity : AppCompatActivity() {
 
     private fun fixSecurityProviders() {
         Security.removeProvider("BC")
+        Security.removeProvider("AndroidOpenSSL") // We need to remove this provider because this provider claims to implement some curves while it actually does not, resulting in a bug during PACE
         Security.insertProviderAt(BouncyCastleProvider(), 0)
     }
 

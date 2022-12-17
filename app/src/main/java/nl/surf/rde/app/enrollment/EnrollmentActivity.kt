@@ -17,6 +17,8 @@ import nl.surf.rde.app.MainActivity
 import nl.surf.rde.app.common.ReadMRZActivity
 import nl.surf.rde.app.common.ScanQRActivity
 import nl.surf.rde.data.RDEEnrollmentParameters
+import java.security.Provider
+import java.security.Security
 
 class EnrollmentActivity : AppCompatActivity() {
     private val client = HttpClient(OkHttp) { // We need to use OkHttp because of DNS + IPv6 issues with CIO engine
@@ -33,9 +35,13 @@ class EnrollmentActivity : AppCompatActivity() {
     private var withMRZData = false
     private var withFaceImageData = false
 
+    private lateinit var openSSLSecurityProvider : Provider
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         launchQRScanner()
+
+        openSSLSecurityProvider = Security.getProvider("AndroidOpenSSL") // We need to save this, as the ReadNFCActivity will remove it from the list of providers
     }
 
     private fun launchQRScanner() {
@@ -64,6 +70,8 @@ class EnrollmentActivity : AppCompatActivity() {
     }
 
     private fun performEnrollment() {
+        Security.insertProviderAt(openSSLSecurityProvider, 1) // We need to re-add the OpenSSLSecurityProvider, as the ReadNFCActivity removed it from the list of providers
+
         runBlocking {
             client.post(socketUrl) {
                 contentType(ContentType.Application.Json)
