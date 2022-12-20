@@ -16,7 +16,7 @@ class EnrollmentReadNFCActivity : ReadNFCActivity() {
     private var withSecurityData = false
     private var withMRZData = false
     private var withFaceImageData = false
-    private var disableWhenPersonalNumberFound = false
+    private var disableWhenPersonalNumberFound = true
 
     companion object {
         const val RDE_DG_ID = 14
