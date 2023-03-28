@@ -1,7 +1,7 @@
 # RDE client app (android)
 
 This repository contains the source code for the RDE client app for Android.
-It uses the [RDE Java client library](https://gitlab.surf.nl/filesender/rde-java-client) for implementing RDE functionality, which is included as a submodule.
+It uses the [RDE Java client library](https://github.com/JobDoesburg/rde-java-client) for implementing RDE functionality, which is included as a submodule.
 
 ## Usage
 The app implements the following functionality:
@@ -16,5 +16,5 @@ After the enrollment process is finished, the enrollment parameters are pushed t
 
 ### Retrieving secret keys
 To retrieve secret keys from an e-passport, the app needs to scan a QR code containing a WebSocket URL.
-The app will follow the [DecryptionHandshake protocol](https://gitlab.surf.nl/filesender/rde-js-client/-/blob/main/src/decryption/handshake-protocol.md) to set up a tunnel to the [RDE JS client](https://gitlab.surf.nl/filesender/rde-js-client) via the WebSocket.
+The app will follow the [DecryptionHandshake protocol](https://github.com/JobDoesburg/rde-js-client/-/blob/main/src/decryption/handshake-protocol.md) to set up a tunnel to the [RDE JS client](https://github.com/JobDoesburg/rde-js-client) via the WebSocket.
 It then receives the DecryptionParameters object from the RDE JS client and uses it to retrieve the secret key from the e-passport, which is then sent back to the RDE JS client.
