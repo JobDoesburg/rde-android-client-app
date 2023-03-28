@@ -1,3 +1,3 @@
 [submodule "rde-java-client"]
 	path = rde-java-client
-	url = git@gitlab.surf.nl:filesender/rde-java-client.git
+	url = git@github.com:JobDoesburg/rde-java-client.git
